@@ -3,12 +3,15 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useQuery } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { PieChart } from "react-native-gifted-charts";
 import { RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import BudgetBar from "../../components/BudgetBar";
+import IncomeExpenseChart from "../../components/charts/IncomeExpenseChart";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import SkeletonCard from "../../components/ui/SkeletonCard";
+import { MonthlyTrendDto } from "../../types/api";
 import { budgetsApi } from "../../api/budgets";
 import { savingGoalsApi } from "../../api/savingGoals";
 import { colors } from "../../constants/colors";
@@ -72,8 +75,21 @@ function formatShortMoney(value: number): string {
   return formatMoney(value);
 }
 
+/** Localized 3-letter month label, robust to numeric ("5"), name ("May") or date inputs. */
+function monthShort(point: MonthlyTrendDto, locale: string): string {
+  const asNum = Number(point.month);
+  if (!Number.isNaN(asNum) && asNum >= 1 && asNum <= 12) {
+    return new Date(2000, asNum - 1, 1)
+      .toLocaleString(locale, { month: "short" })
+      .replace(".", "");
+  }
+  return String(point.month).slice(0, 3);
+}
+
 export default function DashboardScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language || "es";
+  const [trendMonths, setTrendMonths] = useState<3 | 6>(6);
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NativeStackNavigationProp<AppStackParams>>();
   const user = useAuthStore((state) => state.user);
@@ -87,6 +103,16 @@ export default function DashboardScreen() {
     queryKey: ["saving-goals"],
     queryFn: savingGoalsApi.getSavingGoals,
   });
+
+  const trend = useMemo(() => {
+    const all = (data?.monthlyTrend ?? []) as MonthlyTrendDto[];
+    const sliced = all.slice(-trendMonths);
+    const income = sliced.reduce((sum, point) => sum + point.income, 0);
+    const expenses = sliced.reduce((sum, point) => sum + point.expenses, 0);
+    const net = income - expenses;
+    const rate = income > 0 ? Math.round((net / income) * 100) : 0;
+    return { sliced, income, expenses, net, rate };
+  }, [data?.monthlyTrend, trendMonths]);
 
   if (!data) {
     return (
@@ -109,6 +135,13 @@ export default function DashboardScreen() {
     .toUpperCase();
 
   const monthTotal = categories.reduce((sum, item) => sum + item.amount, 0);
+
+  const currentMonthShort = new Date()
+    .toLocaleString(locale, { month: "short" })
+    .replace(".", "")
+    .toUpperCase();
+
+  const savingsPositive = trend.net >= 0;
 
   const pieData = categories.map((item) => ({
     value: Math.max(1, item.amount),
@@ -141,7 +174,12 @@ export default function DashboardScreen() {
           </View>
         </View>
 
-        <TouchableOpacity style={styles.bellBtn}>
+        <TouchableOpacity
+          style={styles.bellBtn}
+          accessibilityRole="button"
+          accessibilityLabel={t("profile.notifications")}
+          onPress={() => navigation.navigate("Notifications")}
+        >
           <Ionicons name="notifications-outline" size={22} color={colors.textSecondary} />
           <View style={styles.unreadDot} />
         </TouchableOpacity>
@@ -171,6 +209,8 @@ export default function DashboardScreen() {
           <TouchableOpacity
             key={item.key}
             style={styles.quickActionItem}
+            accessibilityRole="button"
+            accessibilityLabel={t(item.labelKey)}
             onPress={() => {
               if (item.key === "income") {
                 navigation.navigate("Tabs", { screen: "AddTransaction", params: { preSelectedType: "Income" } });
@@ -195,11 +235,94 @@ export default function DashboardScreen() {
         ))}
       </View>
 
+      {/* ── Income vs Expenses ─────────────────────────────────────────── */}
+      <View style={styles.sectionWrap}>
+        <View style={styles.sectionHead}>
+          <Text style={styles.sectionTitle}>{t("dashboard.incomeVsExpenses")}</Text>
+
+          {/* Period selector — progressive disclosure (3M / 6M) */}
+          <View style={styles.periodToggle} accessibilityRole="tablist">
+            {([3, 6] as const).map((months) => {
+              const active = trendMonths === months;
+              return (
+                <TouchableOpacity
+                  key={months}
+                  accessibilityRole="tab"
+                  accessibilityState={{ selected: active }}
+                  accessibilityLabel={months === 3 ? t("dashboard.last3m") : t("dashboard.last6m")}
+                  style={[styles.periodPill, active && styles.periodPillActive]}
+                  onPress={() => setTrendMonths(months)}
+                >
+                  <Text style={[styles.periodText, active && styles.periodTextActive]}>
+                    {months === 3 ? t("dashboard.last3m") : t("dashboard.last6m")}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </View>
+
+        <View style={styles.chartCard}>
+          {/* Net savings headline — strongest element in the card (hierarchy) */}
+          <View style={styles.ieTopRow}>
+            <View>
+              <Text style={styles.ieNetLabel}>{t("dashboard.netSavings")}</Text>
+              <Text
+                style={[
+                  styles.ieNetValue,
+                  { color: savingsPositive ? colors.income : colors.expense },
+                ]}
+              >
+                {savingsPositive ? "+" : "-"}
+                {formatMoney(Math.abs(trend.net))}
+              </Text>
+            </View>
+
+            <View
+              style={[
+                styles.savingsChip,
+                {
+                  backgroundColor: savingsPositive ? "rgba(0,214,143,0.12)" : "rgba(255,71,87,0.12)",
+                  borderColor: savingsPositive ? "rgba(0,214,143,0.3)" : "rgba(255,71,87,0.3)",
+                },
+              ]}
+            >
+              <Ionicons
+                name={savingsPositive ? "trending-up" : "trending-down"}
+                size={13}
+                color={savingsPositive ? colors.income : colors.expense}
+              />
+              <Text
+                style={[
+                  styles.savingsChipText,
+                  { color: savingsPositive ? colors.income : colors.expense },
+                ]}
+              >
+                {t("dashboard.savingsRate")} {trend.rate}%
+              </Text>
+            </View>
+          </View>
+
+          {trend.sliced.length >= 2 ? (
+            <IncomeExpenseChart
+              data={trend.sliced}
+              monthLabel={(point) => monthShort(point, locale)}
+              formatShort={formatShortMoney}
+            />
+          ) : (
+            <View style={styles.chartEmptyBox}>
+              <Ionicons name="bar-chart-outline" size={28} color={colors.textMuted} />
+              <Text style={styles.chartEmptyText}>{t("dashboard.chartEmpty")}</Text>
+            </View>
+          )}
+        </View>
+      </View>
+
       <View style={styles.sectionWrap}>
         <View style={styles.sectionHead}>
           <Text style={styles.sectionTitle}>{t("dashboard.spendingOverview")}</Text>
           <View style={styles.monthPill}>
-            <Text style={styles.monthText}>ABR</Text>
+            <Text style={styles.monthText}>{currentMonthShort}</Text>
           </View>
         </View>
 
@@ -214,7 +337,7 @@ export default function DashboardScreen() {
                 centerLabelComponent={() => (
                   <View style={{ alignItems: "center" }}>
                     <Text style={styles.chartCenterAmount}>{formatShortMoney(monthTotal)}</Text>
-                    <Text style={styles.chartCenterMonth}>ABR</Text>
+                    <Text style={styles.chartCenterMonth}>{currentMonthShort}</Text>
                   </View>
                 )}
               />
@@ -500,6 +623,80 @@ const styles = StyleSheet.create({
     borderColor: colors.bgCardBorder,
     borderRadius: 16,
     padding: 16,
+  },
+  // Period selector (progressive disclosure)
+  periodToggle: {
+    flexDirection: "row",
+    backgroundColor: colors.bgCardAlt,
+    borderWidth: 1,
+    borderColor: colors.bgCardBorder,
+    borderRadius: 99,
+    padding: 3,
+    gap: 2,
+  },
+  periodPill: {
+    paddingHorizontal: 14,
+    paddingVertical: 5,
+    borderRadius: 99,
+    minWidth: 40,
+    alignItems: "center",
+  },
+  periodPillActive: {
+    backgroundColor: colors.primary,
+  },
+  periodText: {
+    color: colors.textSecondary,
+    fontSize: 12,
+    fontFamily: typography.fontFamily.bodyMedium,
+  },
+  periodTextActive: {
+    color: colors.textInverse,
+    fontFamily: typography.fontFamily.headingSemiBold,
+  },
+  // Income vs Expenses card internals
+  ieTopRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: 16,
+  },
+  ieNetLabel: {
+    color: colors.textSecondary,
+    fontSize: 11,
+    fontFamily: typography.fontFamily.bodyMedium,
+    letterSpacing: 1.2,
+    textTransform: "uppercase",
+  },
+  ieNetValue: {
+    marginTop: 4,
+    fontSize: 24,
+    fontFamily: typography.fontFamily.monoExtraBold,
+  },
+  savingsChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    borderWidth: 1,
+    borderRadius: 99,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+  },
+  savingsChipText: {
+    fontSize: 12,
+    fontFamily: typography.fontFamily.bodyMedium,
+  },
+  chartEmptyBox: {
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    paddingVertical: 28,
+  },
+  chartEmptyText: {
+    color: colors.textSecondary,
+    fontSize: 13,
+    fontFamily: typography.fontFamily.body,
+    textAlign: "center",
+    paddingHorizontal: 24,
   },
   chartRow: {
     flexDirection: "row",
