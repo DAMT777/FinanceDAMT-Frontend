@@ -4,7 +4,10 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import LanguageSelector from "../../components/LanguageSelector";
+import { AppStackParams } from "../../navigation/types";
 import ConfirmDialog from "../../components/ui/ConfirmDialog";
 import { colors } from "../../constants/colors";
 import { typography } from "../../constants/typography";
@@ -14,6 +17,7 @@ import { useUIStore } from "../../store/uiStore";
 export default function ProfileScreen() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
+  const navigation = useNavigation<NativeStackNavigationProp<AppStackParams>>();
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
   const currentLanguage = useUIStore((state) => state.currentLanguage);
@@ -54,6 +58,18 @@ export default function ProfileScreen() {
         </View>
 
         <View style={styles.sections}>
+          <Text style={styles.sectionLabel}>{t("profile.manage").toUpperCase()}</Text>
+          <View style={styles.card}>
+            <SettingRow
+              icon="repeat-outline"
+              iconColor={colors.accent}
+              iconBg="rgba(108,99,255,0.1)"
+              label={t("subscriptions.title")}
+              value=""
+              onPress={() => navigation.navigate("Subscriptions")}
+            />
+          </View>
+
           <Text style={styles.sectionLabel}>{t("profile.preferences").toUpperCase()}</Text>
           <View style={styles.card}>
             <SettingRow

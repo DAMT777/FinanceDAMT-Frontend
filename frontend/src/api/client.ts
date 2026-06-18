@@ -49,7 +49,7 @@ apiClient.interceptors.response.use(
       const { data } = await axios.post<{
         accessToken: string;
         refreshToken: string;
-      }>(`${apiClient.defaults.baseURL}/auth/refresh`, { refreshToken });
+      }>(`${apiClient.defaults.baseURL}/auth/refresh`, { token: refreshToken });
 
       await storage.setItem(ACCESS_TOKEN_KEY, data.accessToken);
       await storage.setItem(REFRESH_TOKEN_KEY, data.refreshToken);

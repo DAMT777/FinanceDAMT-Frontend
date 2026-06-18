@@ -29,6 +29,8 @@ export type AppStackParams = {
   TransactionDetail: { transaction: TransactionDto };
   Notifications: undefined;
   AddBudget: undefined;
+  Subscriptions: undefined;
+  AddSubscription: undefined;
   Chat: undefined;
   AIRecommendations: undefined;
 };

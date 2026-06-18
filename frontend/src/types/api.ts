@@ -243,6 +243,40 @@ export interface AddContributionRequest {
 
 export interface UpdateSavingGoalRequest extends Partial<CreateSavingGoalRequest> {}
 
+// Subscriptions
+export type BillingCycle = "Weekly" | "Monthly" | "Quarterly" | "Yearly";
+
+export interface SubscriptionDto {
+  id: string;
+  name: string;
+  amount: number;
+  billingCycle: BillingCycle;
+  nextBillingDate: string;
+  icon: string;
+  isActive: boolean;
+  notes?: string;
+  monthlyCost: number;
+}
+
+export interface CreateSubscriptionRequest {
+  name: string;
+  amount: number;
+  billingCycle: BillingCycle;
+  nextBillingDate: string;
+  icon: string;
+  notes?: string;
+}
+
+export interface UpdateSubscriptionRequest {
+  name: string;
+  amount: number;
+  billingCycle: BillingCycle;
+  nextBillingDate: string;
+  icon: string;
+  isActive: boolean;
+  notes?: string;
+}
+
 // AI
 export interface ChatMessageDto {
   role: "user" | "assistant";

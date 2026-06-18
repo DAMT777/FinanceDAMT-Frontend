@@ -8,6 +8,8 @@ import GoalContributionScreen from "../screens/goals/GoalContributionScreen";
 import TransactionDetailScreen from "../screens/transactions/TransactionDetailScreen";
 import NotificationsScreen from "../screens/notifications/NotificationsScreen";
 import AddBudgetScreen from "../screens/budgets/AddBudgetScreen";
+import SubscriptionsScreen from "../screens/subscriptions/SubscriptionsScreen";
+import AddSubscriptionScreen from "../screens/subscriptions/AddSubscriptionScreen";
 import ChatScreen from "../screens/ai/ChatScreen";
 import RecommendationsScreen from "../screens/ai/RecommendationsScreen";
 
@@ -50,6 +52,16 @@ export default function AppStackNavigator() {
       <AppStack.Screen
         name="AddBudget"
         component={AddBudgetScreen}
+        options={{ presentation: "modal" }}
+      />
+      <AppStack.Screen
+        name="Subscriptions"
+        component={SubscriptionsScreen}
+        options={{ presentation: "card" }}
+      />
+      <AppStack.Screen
+        name="AddSubscription"
+        component={AddSubscriptionScreen}
         options={{ presentation: "modal" }}
       />
       <AppStack.Screen
