@@ -158,7 +158,7 @@ export default function SubscriptionsScreen() {
             </View>
           ) : (
             <EmptyState
-              icon="Meta"
+              icon="🔁"
               title={t("subscriptions.empty")}
               subtitle={t("subscriptions.emptySubtitle")}
               actionLabel={t("subscriptions.addFirst")}

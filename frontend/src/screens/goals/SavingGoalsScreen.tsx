@@ -164,7 +164,7 @@ export default function SavingGoalsScreen() {
           </View>
         ) : (
           <EmptyState
-            icon="Meta"
+            icon="🎯"
             title={t("goals.noGoalsSet")}
             subtitle={t("goals.savingFor")}
             actionLabel={t("goals.createFirst")}

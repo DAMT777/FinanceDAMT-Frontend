@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { aiApi } from "../api/ai";
 import { ChatRequest } from "../types/api";
 
@@ -21,7 +21,16 @@ export function useFinancialScore() {
 }
 
 export function useChatMessage() {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (payload: ChatRequest) => aiApi.sendChatMessage(payload),
+    onSuccess: () => {
+      // The agent may have stored a transaction from natural language,
+      // so refresh anything that reflects balances and activity.
+      void queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      void queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      void queryClient.invalidateQueries({ queryKey: ["budget-status"] });
+      void queryClient.invalidateQueries({ queryKey: ["accounts"] });
+    },
   });
 }

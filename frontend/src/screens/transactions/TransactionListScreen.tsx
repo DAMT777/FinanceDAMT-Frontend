@@ -1,5 +1,4 @@
 import { Ionicons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
 import { useEffect, useMemo, useState } from "react";
 import {
   Pressable,
@@ -7,6 +6,7 @@ import {
   SectionList,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from "react-native";
 import { useTranslation } from "react-i18next";
@@ -21,7 +21,6 @@ import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import TransactionItem from "../../components/TransactionItem";
 import EmptyState from "../../components/ui/EmptyState";
-import Input from "../../components/ui/Input";
 import { colors } from "../../constants/colors";
 import { spacing } from "../../constants/spacing";
 import { typography } from "../../constants/typography";
@@ -85,16 +84,6 @@ export default function TransactionListScreen() {
 
   const sections = useMemo(() => groupTransactions(filtered), [filtered]);
 
-  // FAB entrance animation
-  const fabScale = useSharedValue(0);
-  useEffect(() => {
-    fabScale.value = withSpring(1, { damping: 8, stiffness: 180 });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  const fabStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: fabScale.value }],
-  }));
-
   // Screen entrance
   const screenOpacity = useSharedValue(0);
   const screenY = useSharedValue(16);
@@ -121,11 +110,11 @@ export default function TransactionListScreen() {
       {/* Search bar */}
       <View style={styles.searchBar}>
         <Ionicons name="search-outline" size={18} color={colors.textMuted} />
-        <Input
-          label={t("transactions.search")}
+        <TextInput
           value={search}
           onChangeText={setSearch}
-          placeholder=""
+          placeholder={t("transactions.search")}
+          placeholderTextColor={colors.textMuted}
           style={styles.searchInput}
         />
         {search ? (
@@ -214,7 +203,7 @@ export default function TransactionListScreen() {
       ) : (
         <View style={styles.emptyWrap}>
           <EmptyState
-            icon="Mov"
+            icon="🧾"
             title={t("transactions.noTransactions")}
             subtitle={t("transactions.addFirst")}
             actionLabel={t("transactions.addTransaction")}
@@ -222,25 +211,6 @@ export default function TransactionListScreen() {
           />
         </View>
       )}
-
-      {/* Floating Action Button */}
-      <Animated.View style={[styles.fabWrap, fabStyle]}>
-        <Pressable
-          style={styles.fabPressable}
-          onPressIn={() => { fabScale.value = withSpring(0.88, { damping: 12 }); }}
-          onPressOut={() => { fabScale.value = withSpring(1, { damping: 12 }); }}
-          onPress={() => navigation.navigate("Tabs", { screen: "AddTransaction" })}
-        >
-          <LinearGradient
-            colors={["#00D68F", "#00B87A"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.fab}
-          >
-            <Ionicons name="add" size={30} color="#fff" />
-          </LinearGradient>
-        </Pressable>
-      </Animated.View>
     </Animated.View>
   );
 }
@@ -348,26 +318,5 @@ const styles = StyleSheet.create({
   emptyWrap: {
     flex: 1,
     justifyContent: "center",
-  },
-  fabWrap: {
-    position: "absolute",
-    right: spacing.lg,
-    bottom: 96,
-  },
-  fabPressable: {
-    borderRadius: 28,
-    overflow: "hidden",
-  },
-  fab: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: colors.primary,
-    shadowOpacity: 0.4,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 10,
   },
 });

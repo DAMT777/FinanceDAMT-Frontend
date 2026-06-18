@@ -12,6 +12,7 @@ import { AppTabParams } from "./types";
 import { colors } from "../constants/colors";
 import { spacing } from "../constants/spacing";
 import { typography } from "../constants/typography";
+import FloatingAIButton from "../components/FloatingAIButton";
 import DashboardScreen from "../screens/dashboard/DashboardScreen";
 import TransactionListScreen from "../screens/transactions/TransactionListScreen";
 import AddTransactionScreen from "../screens/transactions/AddTransactionScreen";
@@ -147,16 +148,19 @@ function CustomTabBar({ state, navigation }: BottomTabBarProps) {
 
 export default function AppNavigator() {
   return (
-    <Tab.Navigator
-      tabBar={(props) => <CustomTabBar {...props} />}
-      screenOptions={{ headerShown: false }}
-    >
-      <Tab.Screen name="Dashboard" component={DashboardScreen} />
-      <Tab.Screen name="Transactions" component={TransactionListScreen} />
-      <Tab.Screen name="AddTransaction" component={AddTransactionScreen} />
-      <Tab.Screen name="Goals" component={SavingGoalsScreen} />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
-    </Tab.Navigator>
+    <View style={{ flex: 1 }}>
+      <Tab.Navigator
+        tabBar={(props) => <CustomTabBar {...props} />}
+        screenOptions={{ headerShown: false }}
+      >
+        <Tab.Screen name="Dashboard" component={DashboardScreen} />
+        <Tab.Screen name="Transactions" component={TransactionListScreen} />
+        <Tab.Screen name="AddTransaction" component={AddTransactionScreen} />
+        <Tab.Screen name="Goals" component={SavingGoalsScreen} />
+        <Tab.Screen name="Profile" component={ProfileScreen} />
+      </Tab.Navigator>
+      <FloatingAIButton />
+    </View>
   );
 }
 
