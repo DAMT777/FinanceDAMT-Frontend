@@ -17,7 +17,13 @@ const AppStack = createNativeStackNavigator<AppStackParams>();
 
 export default function AppStackNavigator() {
   return (
-    <AppStack.Navigator screenOptions={{ headerShown: false }}>
+    <AppStack.Navigator
+      screenOptions={{
+        headerShown: false,
+        animation: "slide_from_right",
+        animationDuration: 280,
+      }}
+    >
       <AppStack.Screen name="Tabs" component={AppNavigator} />
       <AppStack.Screen
         name="Accounts"

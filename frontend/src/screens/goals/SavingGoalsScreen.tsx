@@ -10,6 +10,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
 import AnimatedNumber from "../../components/AnimatedNumber";
 import GoalCard from "../../components/GoalCard";
@@ -40,6 +41,7 @@ function safePercentage(currentAmount?: number, targetAmount?: number): number {
 
 export default function SavingGoalsScreen() {
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
   const navigation = useNavigation<NativeStackNavigationProp<AppStackParams>>();
   const goalsQuery = useGoals();
   const goals = goalsQuery.data ?? [];
@@ -64,7 +66,10 @@ export default function SavingGoalsScreen() {
     <Animated.View style={[{ flex: 1, backgroundColor: colors.bg }, rootStyle]}>
       <ScrollView
         style={styles.scroll}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[
+          styles.content,
+          { paddingTop: insets.top + spacing.md, paddingBottom: insets.bottom + 110 },
+        ]}
         showsVerticalScrollIndicator={false}
       >
         <Text style={styles.title}>{t("goals.title")}</Text>

@@ -21,7 +21,18 @@ import { useCategories } from "../../hooks/useCategories";
 import { useSetBudget } from "../../hooks/useBudgets";
 import { useUIStore } from "../../store/uiStore";
 import { getApiErrorMessage } from "../../utils/apiError";
+import { getCategoryDisplay } from "../../utils/categoryIcons";
 import { CategoryDto } from "../../types/api";
+
+// API categories carry an `icon` that may be a real emoji or a Lucide-style
+// name ("shirt", "book-open"). Only emojis (non-ASCII) should render directly;
+// otherwise fall back to the emoji mapped from the category name.
+function categoryEmoji(cat: CategoryDto): string {
+  const icon = cat.icon ?? "";
+  const isEmoji = [...icon].some((ch) => (ch.codePointAt(0) ?? 0) > 127);
+  if (isEmoji) return icon;
+  return getCategoryDisplay(cat.name, cat.color).emoji;
+}
 
 const DEFAULT_EXPENSE_CATEGORIES: CategoryDto[] = [
   { id: "food", name: "Comida", icon: "\u{1F354}", color: "#FF6B6B", type: "Expense", isGlobal: false },
@@ -74,7 +85,7 @@ export default function AddBudgetScreen() {
   return (
     <KeyboardAvoidingView
       style={styles.root}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView
         contentContainerStyle={styles.content}
@@ -114,7 +125,7 @@ export default function AddBudgetScreen() {
                     ]}
                     onPress={() => setSelectedCategoryId(cat.id)}
                   >
-                    <Text style={styles.catIcon}>{cat.icon || "•"}</Text>
+                    <Text style={styles.catIcon}>{categoryEmoji(cat)}</Text>
                     <Text style={[styles.catName, active && { color: cat.color }]} numberOfLines={1}>
                       {cat.name}
                     </Text>
@@ -138,7 +149,7 @@ export default function AddBudgetScreen() {
           />
           {selectedCategory ? (
             <Text style={styles.categoryHint}>
-              {t("budgets.budgetForMonth", { name: `${selectedCategory.icon} ${selectedCategory.name}` })}
+              {t("budgets.budgetForMonth", { name: `${categoryEmoji(selectedCategory)} ${selectedCategory.name}` })}
             </Text>
           ) : null}
         </View>

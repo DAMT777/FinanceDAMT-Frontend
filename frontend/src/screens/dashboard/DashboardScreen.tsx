@@ -12,7 +12,6 @@ import BudgetBar from "../../components/BudgetBar";
 import IncomeExpenseChart from "../../components/charts/IncomeExpenseChart";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import SkeletonCard from "../../components/ui/SkeletonCard";
-import { MonthlyTrendDto } from "../../types/api";
 import { budgetsApi } from "../../api/budgets";
 import { savingGoalsApi } from "../../api/savingGoals";
 import { colors } from "../../constants/colors";
@@ -22,6 +21,13 @@ import { useUnreadCount } from "../../hooks/useNotifications";
 import { useTransactions } from "../../hooks/useTransactions";
 import { AppStackParams } from "../../navigation/types";
 import { getCategoryDisplay } from "../../utils/categoryIcons";
+import {
+  CHART_RANGES,
+  CHART_RANGE_LABELS,
+  ChartRange,
+  buildTrendBuckets,
+  rangeStart,
+} from "../../utils/trendBuckets";
 import { useAuthStore } from "../../store/authStore";
 
 const QUICK_ACTIONS = [
@@ -78,17 +84,6 @@ function formatShortMoney(value: number): string {
   return formatMoney(value);
 }
 
-/** Localized 3-letter month label, robust to numeric ("5"), name ("May") or date inputs. */
-function monthShort(point: MonthlyTrendDto, locale: string): string {
-  const asNum = Number(point.month);
-  if (!Number.isNaN(asNum) && asNum >= 1 && asNum <= 12) {
-    return new Date(2000, asNum - 1, 1)
-      .toLocaleString(locale, { month: "short" })
-      .replace(".", "");
-  }
-  return String(point.month).slice(0, 3);
-}
-
 /** Time-aware greeting key for a friendlier, more human header. */
 function greetingKey(): string {
   const hour = new Date().getHours();
@@ -100,7 +95,7 @@ function greetingKey(): string {
 export default function DashboardScreen() {
   const { t, i18n } = useTranslation();
   const locale = i18n.language || "es";
-  const [trendMonths, setTrendMonths] = useState<3 | 6>(6);
+  const [chartRange, setChartRange] = useState<ChartRange>("6m");
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NativeStackNavigationProp<AppStackParams>>();
   const user = useAuthStore((state) => state.user);
@@ -116,15 +111,21 @@ export default function DashboardScreen() {
     queryFn: savingGoalsApi.getSavingGoals,
   });
 
+  // Chart data is computed from dated transactions so any window (day → year)
+  // can be bucketed by day, week or month as appropriate.
+  const chartDateFrom = useMemo(() => rangeStart(chartRange).toISOString(), [chartRange]);
+  const chartTxQuery = useTransactions({ dateFrom: chartDateFrom, pageSize: 1000 });
+
   const trend = useMemo(() => {
-    const all = (data?.monthlyTrend ?? []) as MonthlyTrendDto[];
-    const sliced = all.slice(-trendMonths);
-    const income = sliced.reduce((sum, point) => sum + point.income, 0);
-    const expenses = sliced.reduce((sum, point) => sum + point.expenses, 0);
+    const items = chartTxQuery.data?.items ?? [];
+    const buckets = buildTrendBuckets(items, chartRange, locale);
+    const income = buckets.reduce((sum, b) => sum + b.income, 0);
+    const expenses = buckets.reduce((sum, b) => sum + b.expenses, 0);
     const net = income - expenses;
     const rate = income > 0 ? Math.round((net / income) * 100) : 0;
-    return { sliced, income, expenses, net, rate };
-  }, [data?.monthlyTrend, trendMonths]);
+    const hasData = buckets.some((b) => b.income > 0 || b.expenses > 0);
+    return { buckets, income, expenses, net, rate, hasData };
+  }, [chartTxQuery.data?.items, chartRange, locale]);
 
   if (!data) {
     return (
@@ -164,7 +165,7 @@ export default function DashboardScreen() {
     return (
       <ScrollView
         style={styles.container}
-        contentContainerStyle={{ paddingBottom: 120 }}
+        contentContainerStyle={{ paddingBottom: insets.bottom + 110 }}
         refreshControl={
           <RefreshControl
             refreshing={isRefetching}
@@ -298,27 +299,27 @@ export default function DashboardScreen() {
       <View style={styles.sectionWrap}>
         <View style={styles.sectionHead}>
           <Text style={styles.sectionTitle}>{t("dashboard.incomeVsExpenses")}</Text>
+        </View>
 
-          {/* Period selector — progressive disclosure (3M / 6M) */}
-          <View style={styles.periodToggle} accessibilityRole="tablist">
-            {([3, 6] as const).map((months) => {
-              const active = trendMonths === months;
-              return (
-                <TouchableOpacity
-                  key={months}
-                  accessibilityRole="tab"
-                  accessibilityState={{ selected: active }}
-                  accessibilityLabel={months === 3 ? t("dashboard.last3m") : t("dashboard.last6m")}
-                  style={[styles.periodPill, active && styles.periodPillActive]}
-                  onPress={() => setTrendMonths(months)}
-                >
-                  <Text style={[styles.periodText, active && styles.periodTextActive]}>
-                    {months === 3 ? t("dashboard.last3m") : t("dashboard.last6m")}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
+        {/* Period selector — full set of windows (1D · 1S · 1M · 3M · 6M · 1A) */}
+        <View style={styles.periodToggle} accessibilityRole="tablist">
+          {CHART_RANGES.map((range) => {
+            const active = chartRange === range;
+            return (
+              <TouchableOpacity
+                key={range}
+                accessibilityRole="tab"
+                accessibilityState={{ selected: active }}
+                accessibilityLabel={CHART_RANGE_LABELS[range]}
+                style={[styles.periodPill, active && styles.periodPillActive]}
+                onPress={() => setChartRange(range)}
+              >
+                <Text style={[styles.periodText, active && styles.periodTextActive]}>
+                  {CHART_RANGE_LABELS[range]}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
 
         <View style={styles.chartCard}>
@@ -362,10 +363,9 @@ export default function DashboardScreen() {
             </View>
           </View>
 
-          {trend.sliced.length >= 2 ? (
+          {trend.hasData ? (
             <IncomeExpenseChart
-              data={trend.sliced}
-              monthLabel={(point) => monthShort(point, locale)}
+              points={trend.buckets}
               formatShort={formatShortMoney}
             />
           ) : (
@@ -747,12 +747,12 @@ const styles = StyleSheet.create({
     borderRadius: 99,
     padding: 3,
     gap: 2,
+    marginTop: 12,
   },
   periodPill: {
-    paddingHorizontal: 14,
-    paddingVertical: 5,
+    flex: 1,
+    paddingVertical: 6,
     borderRadius: 99,
-    minWidth: 40,
     alignItems: "center",
   },
   periodPillActive: {

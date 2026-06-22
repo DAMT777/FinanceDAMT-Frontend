@@ -8,6 +8,7 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AppTabParams } from "./types";
 import { colors } from "../constants/colors";
 import { spacing } from "../constants/spacing";
@@ -106,9 +107,10 @@ function CenterFab({ onPress }: { onPress: () => void }) {
 
 function CustomTabBar({ state, navigation }: BottomTabBarProps) {
   const routes = state.routes;
+  const insets = useSafeAreaInsets();
 
   return (
-    <View style={styles.tabBarWrap}>
+    <View style={[styles.tabBarWrap, { bottom: Math.max(insets.bottom, 12) + 8 }]}>
       <View style={styles.tabBarPill}>
         {routes.map((route, index) => {
           const isFocused = state.index === index;
@@ -151,7 +153,7 @@ export default function AppNavigator() {
     <View style={{ flex: 1 }}>
       <Tab.Navigator
         tabBar={(props) => <CustomTabBar {...props} />}
-        screenOptions={{ headerShown: false }}
+        screenOptions={{ headerShown: false, animation: "shift" }}
       >
         <Tab.Screen name="Dashboard" component={DashboardScreen} />
         <Tab.Screen name="Transactions" component={TransactionListScreen} />

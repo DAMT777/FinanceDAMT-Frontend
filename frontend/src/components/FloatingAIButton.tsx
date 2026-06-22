@@ -5,6 +5,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useTranslation } from "react-i18next";
 import { Pressable, StyleSheet } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "../constants/colors";
 import { AppStackParams } from "../navigation/types";
 
@@ -14,6 +15,7 @@ import { AppStackParams } from "../navigation/types";
  */
 export default function FloatingAIButton() {
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
   const navigation = useNavigation<NativeStackNavigationProp<AppStackParams>>();
   const scale = useSharedValue(1);
 
@@ -22,7 +24,10 @@ export default function FloatingAIButton() {
   }));
 
   return (
-    <Animated.View style={[styles.wrap, animatedStyle]} pointerEvents="box-none">
+    <Animated.View
+      style={[styles.wrap, { bottom: Math.max(insets.bottom, 12) + 84 }, animatedStyle]}
+      pointerEvents="box-none"
+    >
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={t("ai.title")}

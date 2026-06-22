@@ -19,6 +19,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import TransactionItem from "../../components/TransactionItem";
 import EmptyState from "../../components/ui/EmptyState";
 import { colors } from "../../constants/colors";
@@ -65,6 +66,7 @@ function getChipStyle(value: FilterType, active: boolean) {
 
 export default function TransactionListScreen() {
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
   const navigation = useNavigation<NativeStackNavigationProp<AppStackParams>>();
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState<FilterType>("All");
@@ -98,7 +100,7 @@ export default function TransactionListScreen() {
   }));
 
   return (
-    <Animated.View style={[styles.container, screenStyle]}>
+    <Animated.View style={[styles.container, { paddingTop: insets.top + spacing.sm }, screenStyle]}>
       {/* Header */}
       <View style={styles.headerWrap}>
         <Text style={styles.title}>{t("transactions.title")}</Text>
@@ -167,7 +169,7 @@ export default function TransactionListScreen() {
           sections={sections}
           keyExtractor={(item) => item.id}
           stickySectionHeadersEnabled={true}
-          contentContainerStyle={styles.listContent}
+          contentContainerStyle={[styles.listContent, { paddingBottom: insets.bottom + 110 }]}
           refreshControl={
             <RefreshControl
               refreshing={isRefetching}
@@ -219,7 +221,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.bg,
-    paddingTop: spacing.xl,
   },
   headerWrap: {
     paddingHorizontal: spacing.lg,

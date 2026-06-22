@@ -15,6 +15,7 @@ import {
   View,
 } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { z } from "zod";
 import Input from "../../components/ui/Input";
 import { colors } from "../../constants/colors";
@@ -57,6 +58,7 @@ const DEFAULT_CATEGORIES: CategoryDto[] = [
 
 export default function AddTransactionScreen() {
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const route = useRoute<AddTransactionRoute>();
   const existingTransaction = route.params?.existingTransaction;
@@ -186,7 +188,7 @@ export default function AddTransactionScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.topBar}>
+      <View style={[styles.topBar, { paddingTop: insets.top + 8 }]}>
         <TouchableOpacity style={styles.closeBtn} onPress={() => navigation.goBack()}>
           <Ionicons name="close" size={22} color={colors.textSecondary} />
         </TouchableOpacity>
@@ -293,7 +295,6 @@ const styles = StyleSheet.create({
     paddingBottom: 120,
   },
   topBar: {
-    marginTop: 16,
     paddingHorizontal: 20,
     flexDirection: "row",
     alignItems: "center",
