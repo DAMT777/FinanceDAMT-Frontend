@@ -2,6 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FlatList, Pressable, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "../../constants/colors";
 import { typography } from "../../constants/typography";
 import Button from "../../components/ui/Button";
@@ -21,6 +22,7 @@ type OnboardingProps = {
 
 export default function OnboardingScreen({ navigation }: OnboardingProps) {
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
   const [index, setIndex] = useState(0);
   const { width } = useWindowDimensions();
   const listRef = useRef<FlatList<Slide>>(null);
@@ -133,7 +135,7 @@ export default function OnboardingScreen({ navigation }: OnboardingProps) {
               ) : null}
             </View>
 
-            <View style={styles.bottomArea}>
+            <View style={[styles.bottomArea, { paddingBottom: insets.bottom + 24 }]}>
               <Text style={styles.title}>{item.title}</Text>
               <Text style={styles.subtitle}>{item.subtitle}</Text>
 
@@ -328,9 +330,8 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   bottomArea: {
-    height: 220,
+    minHeight: 220,
     paddingHorizontal: 20,
-    paddingBottom: 24,
   },
   title: {
     color: colors.textPrimary,

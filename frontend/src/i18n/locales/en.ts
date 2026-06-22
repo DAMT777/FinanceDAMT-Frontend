@@ -216,7 +216,7 @@ export const en = {
       newGoal: "New Goal",
       chooseIcon: "Choose an icon",
       goalNameExample: "e.g. Emergency fund",
-      deadlineFormat: "Deadline (YYYY-MM-DD)",
+      deadlineFormat: "Deadline",
       deadlineExample: "2025-12-31",
       createGoal: "Create Goal",
       creating: "Creating…",
@@ -364,6 +364,7 @@ export const en = {
       yes: "Yes",
       no: "No",
       close: "Close",
+      selectDate: "Select a date",
     },
   },
 };

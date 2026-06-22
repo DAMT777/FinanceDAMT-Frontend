@@ -221,7 +221,7 @@ export const es = {
       newGoal: "Nueva meta",
       chooseIcon: "Elige un ícono",
       goalNameExample: "ej. Fondo de emergencia",
-      deadlineFormat: "Fecha límite (AAAA-MM-DD)",
+      deadlineFormat: "Fecha límite",
       deadlineExample: "2025-12-31",
       createGoal: "Crear meta",
       creating: "Creando…",
@@ -369,6 +369,7 @@ export const es = {
       yes: "Sí",
       no: "No",
       close: "Cerrar",
+      selectDate: "Selecciona una fecha",
     },
   },
 };

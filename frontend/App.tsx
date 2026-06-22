@@ -2,6 +2,7 @@ import "./src/i18n";
 import "react-native-gesture-handler";
 import { StatusBar } from "expo-status-bar";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { useEffect } from "react";
 import Toast from "react-native-toast-message";
@@ -34,11 +35,13 @@ function ToastBridge() {
 export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <QueryClientProvider client={queryClient}>
-        <RootNavigator />
-        <ToastBridge />
-        <StatusBar style="light" />
-      </QueryClientProvider>
+      <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+        <QueryClientProvider client={queryClient}>
+          <RootNavigator />
+          <ToastBridge />
+          <StatusBar style="light" />
+        </QueryClientProvider>
+      </SafeAreaProvider>
     </GestureHandlerRootView>
   );
 }

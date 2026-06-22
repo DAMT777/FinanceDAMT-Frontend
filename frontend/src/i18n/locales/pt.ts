@@ -216,7 +216,7 @@ export const pt = {
       newGoal: "Nova meta",
       chooseIcon: "Escolha um ícone",
       goalNameExample: "ex. Fundo de emergência",
-      deadlineFormat: "Prazo (AAAA-MM-DD)",
+      deadlineFormat: "Prazo",
       deadlineExample: "2025-12-31",
       createGoal: "Criar meta",
       creating: "Criando…",
@@ -364,6 +364,7 @@ export const pt = {
       yes: "Sim",
       no: "Não",
       close: "Fechar",
+      selectDate: "Selecione uma data",
     },
   },
 };

@@ -58,16 +58,16 @@ const styles = StyleSheet.create({
   },
   glowOuter: {
     position: "absolute",
-    width: 320,
-    height: 320,
-    borderRadius: 160,
+    width: 360,
+    height: 360,
+    borderRadius: 180,
     backgroundColor: "rgba(0,214,143,0.08)",
   },
   glowInner: {
     position: "absolute",
-    width: 220,
-    height: 220,
-    borderRadius: 110,
+    width: 250,
+    height: 250,
+    borderRadius: 125,
     backgroundColor: "rgba(0,214,143,0.12)",
   },
   centerContent: {
@@ -100,6 +100,6 @@ const styles = StyleSheet.create({
     fontFamily: typography.fontFamily.body,
   },
   spinner: {
-    marginTop: 48,
+    marginTop: 24,
   },
 });

@@ -19,6 +19,7 @@ import { typography } from "../../constants/typography";
 import { useCreateSubscription } from "../../hooks/useSubscriptions";
 import { useUIStore } from "../../store/uiStore";
 import { getApiErrorMessage } from "../../utils/apiError";
+import DatePickerField from "../../components/ui/DatePickerField";
 import { BillingCycle } from "../../types/api";
 
 const SUB_EMOJIS = [
@@ -153,13 +154,10 @@ export default function AddSubscriptionScreen() {
         {/* Next billing date */}
         <View style={styles.fieldGroup}>
           <Text style={styles.label}>{t("subscriptions.nextBillingDate")}</Text>
-          <TextInput
-            style={styles.input}
+          <DatePickerField
             value={nextBillingDate}
-            onChangeText={setNextBillingDate}
-            placeholder="AAAA-MM-DD"
-            placeholderTextColor={colors.textMuted}
-            keyboardType="numbers-and-punctuation"
+            onChange={setNextBillingDate}
+            minimumDate={new Date()}
           />
         </View>
 

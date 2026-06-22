@@ -19,6 +19,7 @@ import { typography } from "../../constants/typography";
 import { useCreateGoal } from "../../hooks/useGoals";
 import { useUIStore } from "../../store/uiStore";
 import { getApiErrorMessage } from "../../utils/apiError";
+import DatePickerField from "../../components/ui/DatePickerField";
 
 const GOAL_EMOJIS = [
   "🏠", "🚗", "✈️", "📱", "💻", "🎓", "💍",
@@ -128,13 +129,10 @@ export default function AddGoalScreen() {
         {/* Deadline */}
         <View style={styles.fieldGroup}>
           <Text style={styles.label}>{t("goals.deadlineFormat")}</Text>
-          <TextInput
-            style={styles.input}
+          <DatePickerField
             value={deadline}
-            onChangeText={setDeadline}
-            placeholder="AAAA-MM-DD"
-            placeholderTextColor={colors.textMuted}
-            keyboardType="numbers-and-punctuation"
+            onChange={setDeadline}
+            minimumDate={new Date()}
           />
         </View>
 

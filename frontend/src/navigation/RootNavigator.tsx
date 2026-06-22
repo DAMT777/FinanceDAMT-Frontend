@@ -1,7 +1,8 @@
-import { NavigationContainer } from "@react-navigation/native";
+import { DarkTheme, NavigationContainer, Theme } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useEffect } from "react";
 import { RootStackParams } from "./types";
+import { colors } from "../constants/colors";
 import { useAuthStore } from "../store/authStore";
 import { useUIStore } from "../store/uiStore";
 import AuthNavigator from "./AuthNavigator";
@@ -9,6 +10,20 @@ import AppStackNavigator from "./AppStackNavigator";
 import SplashScreen from "../screens/auth/SplashScreen";
 
 const RootStack = createNativeStackNavigator<RootStackParams>();
+
+// Dark navigation theme so scene/background areas (e.g. behind the system
+// navigation bar) never flash the default white background.
+const navTheme: Theme = {
+  ...DarkTheme,
+  colors: {
+    ...DarkTheme.colors,
+    background: colors.bg,
+    card: colors.bg,
+    text: colors.textPrimary,
+    border: colors.bgCardBorder,
+    primary: colors.primary,
+  },
+};
 
 export default function RootNavigator() {
   const isLoading = useAuthStore((state) => state.isLoading);
@@ -26,8 +41,8 @@ export default function RootNavigator() {
   }
 
   return (
-    <NavigationContainer>
-      <RootStack.Navigator screenOptions={{ headerShown: false }}>
+    <NavigationContainer theme={navTheme}>
+      <RootStack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}>
         {isAuthenticated ? (
           <RootStack.Screen name="App" component={AppStackNavigator} />
         ) : (

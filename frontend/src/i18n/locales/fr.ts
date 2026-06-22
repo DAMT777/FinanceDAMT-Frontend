@@ -216,7 +216,7 @@ export const fr = {
       newGoal: "Nouvel objectif",
       chooseIcon: "Choisir une icône",
       goalNameExample: "ex. Fonds d'urgence",
-      deadlineFormat: "Date limite (AAAA-MM-JJ)",
+      deadlineFormat: "Date limite",
       deadlineExample: "2025-12-31",
       createGoal: "Créer l'objectif",
       creating: "Création…",
@@ -364,6 +364,7 @@ export const fr = {
       yes: "Oui",
       no: "Non",
       close: "Fermer",
+      selectDate: "Choisir une date",
     },
   },
 };

@@ -1,5 +1,6 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { AppStackParams } from "./types";
+import { colors } from "../constants/colors";
 import AppNavigator from "./AppNavigator";
 import AccountsScreen from "../screens/accounts/AccountsScreen";
 import AddAccountScreen from "../screens/accounts/AddAccountScreen";
@@ -22,6 +23,7 @@ export default function AppStackNavigator() {
         headerShown: false,
         animation: "slide_from_right",
         animationDuration: 280,
+        contentStyle: { backgroundColor: colors.bg },
       }}
     >
       <AppStack.Screen name="Tabs" component={AppNavigator} />
