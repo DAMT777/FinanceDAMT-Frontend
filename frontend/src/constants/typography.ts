@@ -10,26 +10,30 @@ export const fontFamily = {
   monoRegular: "DMMono_400Regular",
 } as const;
 
+import { moderateScale } from "../utils/responsive";
+
+// Font sizes and line heights are moderately scaled to the device width so text
+// shrinks on compact phones and grows on large ones without becoming oversized.
 export const fontSize = {
-  xs: 12,
-  sm: 14,
-  md: 16,
-  lg: 18,
-  xl: 20,
-  xxl: 24,
-  display: 40,
-  displayLarge: 56,
+  xs: moderateScale(12),
+  sm: moderateScale(14),
+  md: moderateScale(16),
+  lg: moderateScale(18),
+  xl: moderateScale(20),
+  xxl: moderateScale(24),
+  display: moderateScale(40),
+  displayLarge: moderateScale(56),
 } as const;
 
 export const lineHeight = {
-  xs: 16,
-  sm: 20,
-  md: 24,
-  lg: 26,
-  xl: 28,
-  xxl: 32,
-  display: 48,
-  displayLarge: 64,
+  xs: moderateScale(16),
+  sm: moderateScale(20),
+  md: moderateScale(24),
+  lg: moderateScale(26),
+  xl: moderateScale(28),
+  xxl: moderateScale(32),
+  display: moderateScale(48),
+  displayLarge: moderateScale(64),
 } as const;
 
 export const fontWeight = {

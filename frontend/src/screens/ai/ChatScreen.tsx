@@ -16,6 +16,7 @@ import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "../../constants/colors";
 import { typography } from "../../constants/typography";
+import { moderateScale, scale } from "../../utils/responsive";
 import { useChatMessage } from "../../hooks/useAI";
 import { ChatMessageDto } from "../../types/api";
 
@@ -97,7 +98,10 @@ export default function ChatScreen() {
   const hasText = input.trim().length > 0;
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
       <View style={[styles.header, { paddingTop: insets.top }]}>
         <View style={styles.headerRow}>
           <LinearGradient colors={[colors.accent, "#FF6B9D"]} style={styles.avatar}>
@@ -187,8 +191,7 @@ export default function ChatScreen() {
         </ScrollView>
       </View>
 
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined}>
-        <View style={styles.inputBar}>
+      <View style={[styles.inputBar, { paddingBottom: insets.bottom + 12 }]}>
           <View style={styles.inputWrap}>
             <TextInput
               value={input}
@@ -215,8 +218,7 @@ export default function ChatScreen() {
             />
           </Pressable>
         </View>
-      </KeyboardAvoidingView>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -234,8 +236,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.bg,
   },
   header: {
-    paddingHorizontal: 20,
-    paddingBottom: 14,
+    paddingHorizontal: scale(20),
+    paddingBottom: scale(14),
     borderBottomWidth: 1,
     borderBottomColor: colors.bgCardBorder,
   },
@@ -244,15 +246,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: scale(40),
+    height: scale(40),
+    borderRadius: scale(20),
     alignItems: "center",
     justifyContent: "center",
   },
   headerTitle: {
     color: colors.textPrimary,
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontFamily: typography.fontFamily.headingBold,
   },
   onlineRow: {
@@ -261,21 +263,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   onlineDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    width: scale(8),
+    height: scale(8),
+    borderRadius: scale(4),
     backgroundColor: colors.primary,
-    marginRight: 4,
+    marginRight: scale(4),
   },
   headerSubtitle: {
     color: colors.textSecondary,
-    fontSize: 12,
+    fontSize: moderateScale(12),
     fontFamily: typography.fontFamily.body,
   },
   messagesWrap: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    gap: 10,
+    paddingHorizontal: scale(16),
+    paddingVertical: scale(12),
+    gap: scale(10),
   },
   userRow: {
     alignItems: "flex-end",
@@ -285,39 +287,39 @@ const styles = StyleSheet.create({
     backgroundColor: "#0D2818",
     borderWidth: 1,
     borderColor: "rgba(0,214,143,0.2)",
-    borderRadius: 16,
-    borderBottomRightRadius: 4,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
+    borderRadius: scale(16),
+    borderBottomRightRadius: scale(4),
+    paddingHorizontal: scale(14),
+    paddingVertical: scale(10),
   },
   aiRow: {
     flexDirection: "row",
     alignItems: "flex-start",
-    gap: 8,
+    gap: scale(8),
   },
   aiMiniAvatar: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    width: scale(28),
+    height: scale(28),
+    borderRadius: scale(14),
     backgroundColor: colors.accent,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 4,
+    marginTop: scale(4),
   },
   aiBubble: {
     maxWidth: "82%",
     backgroundColor: colors.bgCard,
     borderLeftWidth: 2,
     borderLeftColor: colors.accent,
-    borderRadius: 16,
-    borderBottomLeftRadius: 4,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
+    borderRadius: scale(16),
+    borderBottomLeftRadius: scale(4),
+    paddingHorizontal: scale(14),
+    paddingVertical: scale(10),
   },
   messageText: {
     color: colors.textPrimary,
-    fontSize: 14,
-    lineHeight: 22,
+    fontSize: moderateScale(14),
+    lineHeight: moderateScale(22),
     fontFamily: typography.fontFamily.body,
   },
   moneyPositive: {
@@ -333,28 +335,28 @@ const styles = StyleSheet.create({
     fontFamily: typography.fontFamily.monoSemiBold,
   },
   emptyWrap: {
-    marginTop: 36,
+    marginTop: scale(36),
     alignItems: "center",
   },
   emptyTitle: {
     color: colors.textPrimary,
-    fontSize: 14,
+    fontSize: moderateScale(14),
     fontFamily: typography.fontFamily.bodyMedium,
   },
   emptySub: {
-    marginTop: 4,
+    marginTop: scale(4),
     color: colors.textSecondary,
-    fontSize: 12,
+    fontSize: moderateScale(12),
     fontFamily: typography.fontFamily.body,
   },
   chipsContainer: {
-    paddingHorizontal: 16,
+    paddingHorizontal: scale(16),
     alignItems: "center",
-    gap: 8,
+    gap: scale(8),
   },
   chip: {
-    height: 32,
-    paddingHorizontal: 12,
+    height: scale(32),
+    paddingHorizontal: scale(12),
     borderRadius: 99,
     borderWidth: 1,
     borderColor: colors.bgCardBorder,
@@ -365,12 +367,12 @@ const styles = StyleSheet.create({
   },
   chipText: {
     fontFamily: typography.fontFamily.body,
-    fontSize: 12,
+    fontSize: moderateScale(12),
     color: colors.textSecondary,
   },
   inputBar: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: scale(16),
+    paddingVertical: scale(12),
     borderTopWidth: 1,
     borderTopColor: colors.bgCardBorder,
     flexDirection: "row",
@@ -381,25 +383,25 @@ const styles = StyleSheet.create({
     backgroundColor: colors.bgCard,
     borderWidth: 1,
     borderColor: colors.bgCardBorder,
-    borderRadius: 24,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
+    borderRadius: scale(24),
+    paddingHorizontal: scale(16),
+    paddingVertical: scale(10),
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
   },
   input: {
     flex: 1,
-    marginRight: 8,
+    marginRight: scale(8),
     color: colors.textPrimary,
-    fontSize: 14,
+    fontSize: moderateScale(14),
     fontFamily: typography.fontFamily.body,
   },
   sendBtn: {
-    marginLeft: 10,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    marginLeft: scale(10),
+    width: scale(40),
+    height: scale(40),
+    borderRadius: scale(20),
     alignItems: "center",
     justifyContent: "center",
   },
