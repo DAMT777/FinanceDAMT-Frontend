@@ -9,17 +9,18 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import ProgressRing from "../../components/ProgressRing";
-import Input from "../../components/ui/Input";
 import { colors } from "../../constants/colors";
 import { spacing } from "../../constants/spacing";
 import { typography } from "../../constants/typography";
 import { useGoals, useAddContribution } from "../../hooks/useGoals";
 import { AppStackParams } from "../../navigation/types";
 import { useUIStore } from "../../store/uiStore";
+import { getApiErrorMessage } from "../../utils/apiError";
 
 type ContributionRoute = RouteProp<AppStackParams, "GoalContribution">;
 
@@ -68,8 +69,8 @@ export default function GoalContributionScreen() {
       });
       showToast(t("goals.contributionAdded"), "success");
       navigation.goBack();
-    } catch {
-      showToast(t("goals.couldNotAddContribution"), "error");
+    } catch (error) {
+      showToast(getApiErrorMessage(error, t, "goals.couldNotAddContribution"), "error");
     }
   };
 
@@ -133,25 +134,25 @@ export default function GoalContributionScreen() {
 
         <View style={styles.fieldGroup}>
           <Text style={styles.label}>{t("goals.contributionAmount")}</Text>
-          <Input
-            label={t("goals.contributionAmount")}
-            style={styles.amountInput}
+          <TextInput
+            style={[styles.input, styles.amountInput]}
             value={amount}
             onChangeText={(text) => setAmount(formatInputAmount(text))}
             keyboardType="numeric"
             placeholder="0"
+            placeholderTextColor={colors.textMuted}
             autoFocus
           />
         </View>
 
         <View style={styles.fieldGroup}>
           <Text style={styles.label}>{t("goals.noteOptional")}</Text>
-          <Input
-            label={t("goals.noteOptional")}
+          <TextInput
             style={styles.input}
             value={note}
             onChangeText={setNote}
             placeholder=""
+            placeholderTextColor={colors.textMuted}
           />
         </View>
 

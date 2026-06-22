@@ -5,6 +5,7 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 import { TransactionDto } from "../types/api";
+import { getCategoryDisplay } from "../utils/categoryIcons";
 import { colors } from "../constants/colors";
 import { spacing } from "../constants/spacing";
 import { typography } from "../constants/typography";
@@ -47,8 +48,8 @@ export default function TransactionItem({ transaction, onPress }: TransactionIte
           { backgroundColor: `${transaction.categoryColor}26` },
         ]}
       >
-        <Text style={[styles.iconText, { color: transaction.categoryColor }]}>
-          {transaction.categoryIcon || "•"}
+        <Text style={styles.iconText}>
+          {getCategoryDisplay(transaction.categoryName, transaction.categoryColor).emoji}
         </Text>
       </View>
 

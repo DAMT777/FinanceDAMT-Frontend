@@ -8,16 +8,17 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
-import Input from "../../components/ui/Input";
 import { colors } from "../../constants/colors";
 import { spacing } from "../../constants/spacing";
 import { typography } from "../../constants/typography";
 import { useCreateSubscription } from "../../hooks/useSubscriptions";
 import { useUIStore } from "../../store/uiStore";
+import { getApiErrorMessage } from "../../utils/apiError";
 import { BillingCycle } from "../../types/api";
 
 const SUB_EMOJIS = [
@@ -62,8 +63,8 @@ export default function AddSubscriptionScreen() {
       });
       showToast(t("subscriptions.created"), "success");
       navigation.goBack();
-    } catch {
-      showToast(t("subscriptions.couldNotCreate"), "error");
+    } catch (error) {
+      showToast(getApiErrorMessage(error, t, "subscriptions.couldNotCreate"), "error");
     }
   };
 
@@ -105,11 +106,11 @@ export default function AddSubscriptionScreen() {
         {/* Name */}
         <View style={styles.fieldGroup}>
           <Text style={styles.label}>{t("subscriptions.name")}</Text>
-          <Input
-            label={t("subscriptions.name")}
+          <TextInput
             value={name}
             onChangeText={setName}
             placeholder="Netflix, Spotify…"
+            placeholderTextColor={colors.textMuted}
             style={styles.input}
             autoFocus
           />
@@ -118,13 +119,13 @@ export default function AddSubscriptionScreen() {
         {/* Amount */}
         <View style={styles.fieldGroup}>
           <Text style={styles.label}>{t("subscriptions.amount")}</Text>
-          <Input
-            label={t("subscriptions.amount")}
+          <TextInput
             style={[styles.input, styles.amountInput]}
             value={amount}
             onChangeText={setAmount}
             keyboardType="numeric"
-            placeholder=""
+            placeholder="0"
+            placeholderTextColor={colors.textMuted}
           />
         </View>
 
@@ -152,12 +153,12 @@ export default function AddSubscriptionScreen() {
         {/* Next billing date */}
         <View style={styles.fieldGroup}>
           <Text style={styles.label}>{t("subscriptions.nextBillingDate")}</Text>
-          <Input
-            label={t("subscriptions.nextBillingDate")}
+          <TextInput
             style={styles.input}
             value={nextBillingDate}
             onChangeText={setNextBillingDate}
-            placeholder="YYYY-MM-DD"
+            placeholder="AAAA-MM-DD"
+            placeholderTextColor={colors.textMuted}
             keyboardType="numbers-and-punctuation"
           />
         </View>

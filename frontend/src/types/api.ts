@@ -277,6 +277,24 @@ export interface UpdateSubscriptionRequest {
   notes?: string;
 }
 
+// Notifications
+export type NotificationType =
+  | "General"
+  | "BudgetAlert"
+  | "GoalMilestone"
+  | "LargeExpense"
+  | "MonthlySummary"
+  | "AIInsight";
+
+export interface NotificationDto {
+  id: string;
+  type: NotificationType;
+  title: string;
+  message: string;
+  isRead: boolean;
+  createdAt: string;
+}
+
 // AI
 export interface ChatMessageDto {
   role: "user" | "assistant";

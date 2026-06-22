@@ -9,17 +9,18 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
-import Input from "../../components/ui/Input";
 import { colors } from "../../constants/colors";
 import { spacing } from "../../constants/spacing";
 import { typography } from "../../constants/typography";
 import { useCategories } from "../../hooks/useCategories";
 import { useSetBudget } from "../../hooks/useBudgets";
 import { useUIStore } from "../../store/uiStore";
+import { getApiErrorMessage } from "../../utils/apiError";
 import { CategoryDto } from "../../types/api";
 
 const DEFAULT_EXPENSE_CATEGORIES: CategoryDto[] = [
@@ -65,8 +66,8 @@ export default function AddBudgetScreen() {
       });
       showToast(t("budgets.budgetSet"), "success");
       navigation.goBack();
-    } catch {
-      showToast(t("budgets.couldNotSet"), "error");
+    } catch (error) {
+      showToast(getApiErrorMessage(error, t, "budgets.couldNotSet"), "error");
     }
   };
 
@@ -127,13 +128,13 @@ export default function AddBudgetScreen() {
 
         <View style={styles.fieldGroup}>
           <Text style={styles.label}>{t("budgets.monthlyLimit")}</Text>
-          <Input
-            label={t("budgets.monthlyLimit")}
+          <TextInput
             style={styles.amountInput}
             value={limit}
             onChangeText={(text) => setLimit(formatInputAmount(text))}
             keyboardType="numeric"
             placeholder="0"
+            placeholderTextColor={colors.textMuted}
           />
           {selectedCategory ? (
             <Text style={styles.categoryHint}>
@@ -251,6 +252,13 @@ const styles = StyleSheet.create({
     fontFamily: typography.fontFamily.bodyMedium,
   },
   amountInput: {
+    backgroundColor: colors.bgCard,
+    borderWidth: 1,
+    borderColor: colors.bgCardBorder,
+    borderRadius: 14,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 14,
+    color: colors.textPrimary,
     fontFamily: typography.fontFamily.mono,
     fontSize: typography.fontSize.md,
   },

@@ -31,6 +31,7 @@ export function useChatMessage() {
       void queryClient.invalidateQueries({ queryKey: ["transactions"] });
       void queryClient.invalidateQueries({ queryKey: ["budget-status"] });
       void queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      void queryClient.invalidateQueries({ queryKey: ["notifications"] });
     },
   });
 }

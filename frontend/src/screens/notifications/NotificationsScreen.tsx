@@ -1,117 +1,122 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { useTranslation } from "react-i18next";
 import { colors } from "../../constants/colors";
 import { spacing } from "../../constants/spacing";
 import { typography } from "../../constants/typography";
+import {
+  useMarkAllNotificationsAsRead,
+  useMarkNotificationAsRead,
+  useNotifications,
+} from "../../hooks/useNotifications";
+import { NotificationType } from "../../types/api";
 
-interface Notification {
-  id: string;
-  icon: string;
-  iconColor: string;
-  iconBg: string;
-  title: string;
-  body: string;
-  time: string;
-  read: boolean;
+const TYPE_STYLE: Record<NotificationType, { icon: keyof typeof Ionicons.glyphMap; color: string; bg: string }> = {
+  BudgetAlert: { icon: "warning-outline", color: colors.warning, bg: "rgba(255,184,48,0.15)" },
+  GoalMilestone: { icon: "trophy-outline", color: colors.primary, bg: "rgba(0,214,143,0.15)" },
+  LargeExpense: { icon: "card-outline", color: colors.expense, bg: "rgba(255,71,87,0.15)" },
+  MonthlySummary: { icon: "trending-up-outline", color: colors.info, bg: "rgba(62,207,248,0.15)" },
+  AIInsight: { icon: "sparkles-outline", color: colors.accent, bg: "rgba(108,99,255,0.15)" },
+  General: { icon: "notifications-outline", color: colors.textSecondary, bg: "rgba(255,255,255,0.06)" },
+};
+
+function useRelativeTime() {
+  const { t } = useTranslation();
+  return (iso: string): string => {
+    const diffMs = Date.now() - new Date(iso).getTime();
+    const minutes = Math.floor(diffMs / 60000);
+    if (minutes < 1) return t("notifications.justNow");
+    if (minutes < 60) return t("notifications.minutesAgo", { count: minutes });
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return t("notifications.hoursAgo", { count: hours });
+    const days = Math.floor(hours / 24);
+    return t("notifications.daysAgo", { count: days });
+  };
 }
 
-const MOCK_NOTIFICATIONS: Notification[] = [
-  {
-    id: "1",
-    icon: "warning-outline",
-    iconColor: colors.warning,
-    iconBg: "rgba(255,184,48,0.15)",
-    title: "Budget alert — Food & Drink",
-    body: "You've reached 80% of your monthly food budget.",
-    time: "2h ago",
-    read: false,
-  },
-  {
-    id: "2",
-    icon: "checkmark-circle-outline",
-    iconColor: colors.primary,
-    iconBg: "rgba(0,214,143,0.15)",
-    title: "Goal milestone reached!",
-    body: "You've hit 50% progress on your Emergency Fund goal.",
-    time: "Yesterday",
-    read: false,
-  },
-  {
-    id: "3",
-    icon: "sparkles-outline",
-    iconColor: colors.accent,
-    iconBg: "rgba(108,99,255,0.15)",
-    title: "New AI insight available",
-    body: "Your spending pattern this month looks healthier than last month.",
-    time: "2 days ago",
-    read: true,
-  },
-  {
-    id: "4",
-    icon: "trending-up-outline",
-    iconColor: colors.info,
-    iconBg: "rgba(62,207,248,0.15)",
-    title: "Monthly summary ready",
-    body: "Your financial summary for March 2025 is available.",
-    time: "1 week ago",
-    read: true,
-  },
-  {
-    id: "5",
-    icon: "card-outline",
-    iconColor: colors.expense,
-    iconBg: "rgba(255,71,87,0.15)",
-    title: "Large expense detected",
-    body: "A transaction of $450,000 COP was recorded in Electronics.",
-    time: "1 week ago",
-    read: true,
-  },
-];
-
 export default function NotificationsScreen() {
+  const { t } = useTranslation();
   const navigation = useNavigation();
-  const unreadCount = MOCK_NOTIFICATIONS.filter((n) => !n.read).length;
+  const relativeTime = useRelativeTime();
+  const { data: notifications = [], refetch, isRefetching } = useNotifications();
+  const markAsRead = useMarkNotificationAsRead();
+  const markAllAsRead = useMarkAllNotificationsAsRead();
+
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   return (
     <View style={styles.root}>
       {/* Header */}
       <View style={styles.header}>
-        <Pressable onPress={() => navigation.goBack()} style={styles.backBtn}>
+        <Pressable onPress={() => navigation.goBack()} style={styles.backBtn} accessibilityRole="button">
           <Ionicons name="arrow-back" size={22} color={colors.textPrimary} />
         </Pressable>
-        <View>
-          <Text style={styles.headerTitle}>Notifications</Text>
+        <View style={styles.headerCenter}>
+          <Text style={styles.headerTitle}>{t("notifications.title")}</Text>
           {unreadCount > 0 ? (
-            <Text style={styles.headerSubtitle}>{unreadCount} unread</Text>
+            <Text style={styles.headerSubtitle}>{t("notifications.unread", { count: unreadCount })}</Text>
           ) : null}
         </View>
-        <View style={styles.headerRight} />
+        {unreadCount > 0 ? (
+          <Pressable
+            onPress={() => markAllAsRead.mutate()}
+            style={styles.markAllBtn}
+            accessibilityRole="button"
+          >
+            <Text style={styles.markAllText}>{t("notifications.markAllRead")}</Text>
+          </Pressable>
+        ) : (
+          <View style={styles.backBtn} />
+        )}
       </View>
 
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefetching}
+            onRefresh={() => void refetch()}
+            tintColor={colors.primary}
+            colors={[colors.primary]}
+          />
+        }
       >
-        {MOCK_NOTIFICATIONS.map((item) => (
-          <Pressable key={item.id} style={[styles.notifCard, !item.read && styles.notifCardUnread]}>
-            {!item.read ? <View style={styles.unreadDot} /> : null}
-            <View style={[styles.notifIconWrap, { backgroundColor: item.iconBg }]}>
-              <Ionicons name={item.icon as keyof typeof Ionicons.glyphMap} size={20} color={item.iconColor} />
-            </View>
-            <View style={styles.notifBody}>
-              <View style={styles.notifTopRow}>
-                <Text style={[styles.notifTitle, !item.read && styles.notifTitleUnread]}>
-                  {item.title}
-                </Text>
-                <Text style={styles.notifTime}>{item.time}</Text>
-              </View>
-              <Text style={styles.notifText} numberOfLines={2}>
-                {item.body}
-              </Text>
-            </View>
-          </Pressable>
-        ))}
+        {notifications.length ? (
+          notifications.map((item) => {
+            const style = TYPE_STYLE[item.type] ?? TYPE_STYLE.General;
+            return (
+              <Pressable
+                key={item.id}
+                style={[styles.notifCard, !item.isRead && styles.notifCardUnread]}
+                onPress={() => {
+                  if (!item.isRead) markAsRead.mutate(item.id);
+                }}
+              >
+                {!item.isRead ? <View style={styles.unreadDot} /> : null}
+                <View style={[styles.notifIconWrap, { backgroundColor: style.bg }]}>
+                  <Ionicons name={style.icon} size={20} color={style.color} />
+                </View>
+                <View style={styles.notifBody}>
+                  <View style={styles.notifTopRow}>
+                    <Text style={[styles.notifTitle, !item.isRead && styles.notifTitleUnread]}>
+                      {item.title}
+                    </Text>
+                    <Text style={styles.notifTime}>{relativeTime(item.createdAt)}</Text>
+                  </View>
+                  <Text style={styles.notifText}>{item.message}</Text>
+                </View>
+              </Pressable>
+            );
+          })
+        ) : (
+          <View style={styles.emptyWrap}>
+            <Text style={styles.emptyIcon}>🔔</Text>
+            <Text style={styles.emptyTitle}>{t("notifications.empty")}</Text>
+            <Text style={styles.emptySubtitle}>{t("notifications.emptySubtitle")}</Text>
+          </View>
+        )}
       </ScrollView>
     </View>
   );
@@ -142,6 +147,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  headerCenter: {
+    flex: 1,
+  },
   headerTitle: {
     color: colors.textPrimary,
     fontFamily: typography.fontFamily.heading,
@@ -153,13 +161,26 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSize.xs,
     marginTop: 2,
   },
-  headerRight: {
-    flex: 1,
+  markAllBtn: {
+    height: 36,
+    paddingHorizontal: spacing.md,
+    borderRadius: 99,
+    borderWidth: 1,
+    borderColor: "rgba(0,214,143,0.3)",
+    backgroundColor: "rgba(0,214,143,0.08)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  markAllText: {
+    color: colors.primary,
+    fontFamily: typography.fontFamily.bodyMedium,
+    fontSize: typography.fontSize.xs,
   },
   content: {
     padding: spacing.lg,
     paddingBottom: 40,
     gap: spacing.sm,
+    flexGrow: 1,
   },
   notifCard: {
     backgroundColor: colors.bgCard,
@@ -223,5 +244,28 @@ const styles = StyleSheet.create({
     fontFamily: typography.fontFamily.body,
     fontSize: 13,
     lineHeight: 19,
+  },
+  emptyWrap: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: spacing.sm,
+    paddingHorizontal: spacing.xl,
+    paddingTop: spacing.xxxl,
+  },
+  emptyIcon: {
+    fontSize: 56,
+  },
+  emptyTitle: {
+    color: colors.textPrimary,
+    fontFamily: typography.fontFamily.headingSemiBold,
+    fontSize: 18,
+    textAlign: "center",
+  },
+  emptySubtitle: {
+    color: colors.textSecondary,
+    fontFamily: typography.fontFamily.body,
+    fontSize: typography.fontSize.sm,
+    textAlign: "center",
   },
 });

@@ -31,6 +31,16 @@ export const colors = {
   gradientDark: ["#141426", "#080812"] as const,
   gradientCard: ["#0F0F1E", "#0F0F1E"] as const,
   gradientBalance: ["#0D2818", "#141426"] as const,
+
+  // ── Identity refresh ("Emerald Aurora") ──────────────────────────────
+  // Layered, premium hero gradient: teal-green → deep blue → indigo-violet.
+  gradientHero: ["#07271D", "#0B1A30", "#16113A"] as const,
+  // Signature 3-stop brand accent (logo mark, rings, highlights).
+  gradientBrand: ["#00E5A0", "#3ECFF8", "#7C5CFC"] as const,
+  // Glassy surfaces and crisp hairlines for depth on dark backgrounds.
+  glass: "rgba(255,255,255,0.05)",
+  hairline: "rgba(255,255,255,0.10)",
+  emeraldGlow: "rgba(0,230,160,0.20)",
 } as const;
 
 export type AppColors = typeof colors;

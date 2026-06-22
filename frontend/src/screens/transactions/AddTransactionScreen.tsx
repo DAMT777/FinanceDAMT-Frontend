@@ -24,6 +24,8 @@ import { useCategories } from "../../hooks/useCategories";
 import { useCreateTransaction, useUpdateTransaction } from "../../hooks/useTransactions";
 import { AppTabParams } from "../../navigation/types";
 import { useUIStore } from "../../store/uiStore";
+import { getApiErrorMessage } from "../../utils/apiError";
+import { getCategoryDisplay } from "../../utils/categoryIcons";
 import { CategoryDto, TransactionType } from "../../types/api";
 
 const formSchema = z.object({
@@ -167,10 +169,18 @@ export default function AddTransactionScreen() {
       if (navigation.canGoBack()) {
         navigation.goBack();
       }
-    } catch {
-      showToast(t("transactions.couldNotSave"), "error");
+    } catch (error) {
+      showToast(getApiErrorMessage(error, t, "transactions.couldNotSave"), "error");
     }
   });
+
+  const handleSavePress = () => {
+    if (!accounts.length) {
+      showToast(t("transactions.needAccount"), "warning");
+      return;
+    }
+    void onSave();
+  };
 
   const isSaving = createTransaction.isPending || updateTransaction.isPending;
 
@@ -238,7 +248,7 @@ export default function AddTransactionScreen() {
                   style={[styles.categoryChip, selected ? styles.categoryChipSelected : undefined]}
                   onPress={() => setValue("categoryId", category.id)}
                 >
-                  <Text style={styles.categoryEmoji}>{category.icon || "•"}</Text>
+                  <Text style={styles.categoryEmoji}>{getCategoryDisplay(category.name, category.color).emoji}</Text>
                   <Text style={styles.categoryName}>{category.name}</Text>
                 </TouchableOpacity>
               );
@@ -261,7 +271,7 @@ export default function AddTransactionScreen() {
 
         <TouchableOpacity
           style={styles.saveBtn}
-          onPress={() => void onSave()}
+          onPress={handleSavePress}
           disabled={!amount || !selectedCategoryId || isSaving}
         >
           <Text style={styles.saveText}>

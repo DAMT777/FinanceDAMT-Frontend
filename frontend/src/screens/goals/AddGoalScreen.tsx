@@ -8,16 +8,17 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
-import Input from "../../components/ui/Input";
 import { colors } from "../../constants/colors";
 import { spacing } from "../../constants/spacing";
 import { typography } from "../../constants/typography";
 import { useCreateGoal } from "../../hooks/useGoals";
 import { useUIStore } from "../../store/uiStore";
+import { getApiErrorMessage } from "../../utils/apiError";
 
 const GOAL_EMOJIS = [
   "🏠", "🚗", "✈️", "📱", "💻", "🎓", "💍",
@@ -55,8 +56,8 @@ export default function AddGoalScreen() {
       });
       showToast(t("goals.goalCreated"), "success");
       navigation.goBack();
-    } catch {
-      showToast(t("goals.couldNotCreateGoal"), "error");
+    } catch (error) {
+      showToast(getApiErrorMessage(error, t, "goals.couldNotCreateGoal"), "error");
     }
   };
 
@@ -101,11 +102,11 @@ export default function AddGoalScreen() {
         {/* Goal name */}
         <View style={styles.fieldGroup}>
           <Text style={styles.label}>{t("goals.goalName")}</Text>
-          <Input
-            label={t("goals.goalName")}
+          <TextInput
             value={name}
             onChangeText={setName}
-            placeholder=""
+            placeholder="Ej. Viaje, moto, fondo…"
+            placeholderTextColor={colors.textMuted}
             style={styles.input}
             autoFocus
           />
@@ -114,25 +115,25 @@ export default function AddGoalScreen() {
         {/* Target amount */}
         <View style={styles.fieldGroup}>
           <Text style={styles.label}>{t("goals.targetAmount")}</Text>
-          <Input
-            label={t("goals.targetAmount")}
-            style={styles.amountInput}
+          <TextInput
+            style={[styles.input, styles.amountInput]}
             value={targetAmount}
             onChangeText={setTargetAmount}
             keyboardType="numeric"
-            placeholder=""
+            placeholder="0"
+            placeholderTextColor={colors.textMuted}
           />
         </View>
 
         {/* Deadline */}
         <View style={styles.fieldGroup}>
           <Text style={styles.label}>{t("goals.deadlineFormat")}</Text>
-          <Input
-            label={t("goals.deadlineFormat")}
+          <TextInput
             style={styles.input}
             value={deadline}
             onChangeText={setDeadline}
-            placeholder=""
+            placeholder="AAAA-MM-DD"
+            placeholderTextColor={colors.textMuted}
             keyboardType="numbers-and-punctuation"
           />
         </View>

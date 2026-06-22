@@ -9,11 +9,11 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Input from "../../components/ui/Input";
 import { colors } from "../../constants/colors";
 import { typography } from "../../constants/typography";
 import { useChatMessage } from "../../hooks/useAI";
@@ -168,8 +168,8 @@ export default function ChatScreen() {
         }}
         ListEmptyComponent={
           <View style={styles.emptyWrap}>
-            <Text style={styles.emptyTitle}>{t("ai.typeMessage")}</Text>
-            <Text style={styles.emptySub}>{t("ai.unavailable")}</Text>
+            <Text style={styles.emptyTitle}>{t("ai.emptyTitle")}</Text>
+            <Text style={styles.emptySub}>{t("ai.emptySubtitle")}</Text>
           </View>
         }
       />
@@ -190,12 +190,13 @@ export default function ChatScreen() {
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined}>
         <View style={styles.inputBar}>
           <View style={styles.inputWrap}>
-            <Input
-              label={t("ai.typeMessage")}
+            <TextInput
               value={input}
               onChangeText={setInput}
+              placeholder={t("ai.typeMessage")}
+              placeholderTextColor={colors.textMuted}
               style={styles.input}
-              placeholder=""
+              multiline
             />
             <Ionicons name="mic-outline" size={18} color={colors.textSecondary} />
           </View>

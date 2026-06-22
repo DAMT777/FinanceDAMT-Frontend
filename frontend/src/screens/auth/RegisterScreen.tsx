@@ -12,6 +12,7 @@ import Animated, {
   withSpring,
   withTiming,
 } from "react-native-reanimated";
+import { AxiosError } from "axios";
 import { z } from "zod";
 import { authApi } from "../../api/auth";
 import Button from "../../components/ui/Button";
@@ -118,8 +119,16 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
       });
       await loginAction(response);
       navigation.navigate("Survey");
-    } catch {
-      showToast(t("auth.couldNotCreate"), "error");
+    } catch (error) {
+      const axiosError = error as AxiosError<{ detail?: string }>;
+      const status = axiosError.response?.status;
+      const detail = axiosError.response?.data?.detail;
+
+      if (status === 409) {
+        showToast(t("auth.emailAlreadyRegistered"), "error");
+      } else {
+        showToast(detail || t("auth.couldNotCreate"), "error");
+      }
     }
   });
 

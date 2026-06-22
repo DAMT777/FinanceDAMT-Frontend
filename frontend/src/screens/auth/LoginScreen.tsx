@@ -13,6 +13,7 @@ import { spacing } from "../../constants/spacing";
 import { typography } from "../../constants/typography";
 import { useAuthStore } from "../../store/authStore";
 import { useUIStore } from "../../store/uiStore";
+import { getApiErrorMessage } from "../../utils/apiError";
 
 const buildLoginSchema = (t: (key: string) => string) => z.object({
   email: z.string().email(t("auth.emailInvalid")),
@@ -63,8 +64,8 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
       const response = await authApi.login(values.email, values.password);
       await loginAction(response);
       showToast(t("auth.welcome"), "success");
-    } catch {
-      showToast(t("auth.invalidCredentials"), "error");
+    } catch (error) {
+      showToast(getApiErrorMessage(error, t, "auth.invalidCredentials"), "error");
     }
   });
 

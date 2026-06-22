@@ -8,16 +8,17 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
-import Input from "../../components/ui/Input";
 import { colors } from "../../constants/colors";
 import { spacing } from "../../constants/spacing";
 import { typography } from "../../constants/typography";
 import { useCreateAccount } from "../../hooks/useAccounts";
 import { useUIStore } from "../../store/uiStore";
+import { getApiErrorMessage } from "../../utils/apiError";
 import { AccountType } from "../../types/api";
 
 const ACCOUNT_TYPES: { type: AccountType; icon: keyof typeof Ionicons.glyphMap; labelKey: string; color: string }[] = [
@@ -50,8 +51,8 @@ export default function AddAccountScreen() {
       });
       showToast(t("accounts.accountCreated"), "success");
       navigation.goBack();
-    } catch {
-      showToast(t("accounts.couldNotCreate"), "error");
+    } catch (error) {
+      showToast(getApiErrorMessage(error, t, "accounts.couldNotCreate"), "error");
     }
   };
 
@@ -102,12 +103,12 @@ export default function AddAccountScreen() {
         {/* Name */}
         <View style={styles.fieldGroup}>
           <Text style={styles.label}>{t("accounts.accountName")}</Text>
-          <Input
-            label={t("accounts.accountName")}
+          <TextInput
             style={styles.input}
             value={name}
             onChangeText={setName}
-            placeholder=""
+            placeholder="Ej. Bancolombia, Efectivo…"
+            placeholderTextColor={colors.textMuted}
             autoFocus
           />
         </View>
@@ -117,13 +118,13 @@ export default function AddAccountScreen() {
           <Text style={styles.label}>
             {type === "Credit" ? t("accounts.currentDebtOrBalance") : t("accounts.initialBalance")}
           </Text>
-          <Input
-            label={type === "Credit" ? t("accounts.currentDebtOrBalance") : t("accounts.initialBalance")}
-            style={styles.amountInput}
+          <TextInput
+            style={[styles.input, styles.amountInput]}
             value={balance}
             onChangeText={setBalance}
             keyboardType="numeric"
-            placeholder=""
+            placeholder="0"
+            placeholderTextColor={colors.textMuted}
           />
         </View>
 
@@ -131,13 +132,13 @@ export default function AddAccountScreen() {
         {type === "Credit" ? (
           <View style={styles.fieldGroup}>
             <Text style={styles.label}>{t("accounts.creditLimit")}</Text>
-            <Input
-              label={t("accounts.creditLimit")}
-              style={styles.amountInput}
+            <TextInput
+              style={[styles.input, styles.amountInput]}
               value={creditLimit}
               onChangeText={setCreditLimit}
               keyboardType="numeric"
-              placeholder=""
+              placeholder="0"
+              placeholderTextColor={colors.textMuted}
             />
           </View>
         ) : null}

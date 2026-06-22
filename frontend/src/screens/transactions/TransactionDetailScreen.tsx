@@ -17,6 +17,7 @@ import { spacing } from "../../constants/spacing";
 import { typography } from "../../constants/typography";
 import { useDeleteTransaction } from "../../hooks/useTransactions";
 import { useUIStore } from "../../store/uiStore";
+import { getApiErrorMessage } from "../../utils/apiError";
 import { AppStackParams } from "../../navigation/types";
 
 type DetailRoute = RouteProp<AppStackParams, "TransactionDetail">;
@@ -63,8 +64,8 @@ export default function TransactionDetailScreen() {
       await deleteTransaction.mutateAsync(transaction.id);
       showToast(t("transactions.deleted"), "success");
       navigation.goBack();
-    } catch {
-      showToast(t("transactions.couldNotDelete"), "error");
+    } catch (error) {
+      showToast(getApiErrorMessage(error, t, "transactions.couldNotDelete"), "error");
     }
   };
 

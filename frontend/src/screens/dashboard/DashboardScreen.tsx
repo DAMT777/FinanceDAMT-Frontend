@@ -7,6 +7,7 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { PieChart } from "react-native-gifted-charts";
 import { RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import AnimatedNumber from "../../components/AnimatedNumber";
 import BudgetBar from "../../components/BudgetBar";
 import IncomeExpenseChart from "../../components/charts/IncomeExpenseChart";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -17,8 +18,10 @@ import { savingGoalsApi } from "../../api/savingGoals";
 import { colors } from "../../constants/colors";
 import { typography } from "../../constants/typography";
 import { useDashboard } from "../../hooks/useDashboard";
+import { useUnreadCount } from "../../hooks/useNotifications";
 import { useTransactions } from "../../hooks/useTransactions";
 import { AppStackParams } from "../../navigation/types";
+import { getCategoryDisplay } from "../../utils/categoryIcons";
 import { useAuthStore } from "../../store/authStore";
 
 const QUICK_ACTIONS = [
@@ -86,6 +89,14 @@ function monthShort(point: MonthlyTrendDto, locale: string): string {
   return String(point.month).slice(0, 3);
 }
 
+/** Time-aware greeting key for a friendlier, more human header. */
+function greetingKey(): string {
+  const hour = new Date().getHours();
+  if (hour < 12) return "dashboard.greeting";
+  if (hour < 19) return "dashboard.greetingAfternoon";
+  return "dashboard.greetingEvening";
+}
+
 export default function DashboardScreen() {
   const { t, i18n } = useTranslation();
   const locale = i18n.language || "es";
@@ -94,6 +105,7 @@ export default function DashboardScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<AppStackParams>>();
   const user = useAuthStore((state) => state.user);
   const { data, refetch, isRefetching } = useDashboard();
+  const { data: unreadCount = 0 } = useUnreadCount();
   const transactions = useTransactions({ page: 1, pageSize: 5 });
   const { data: budgets = [] } = useQuery({
     queryKey: ["budget-status"],
@@ -163,14 +175,16 @@ export default function DashboardScreen() {
         }
         showsVerticalScrollIndicator={false}
       >
-      <View style={[styles.header, { paddingTop: insets.top + 12 }]}> 
+      <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
         <View style={styles.headerLeft}>
-          <LinearGradient colors={[colors.primary, colors.accent]} style={styles.avatar}>
-            <Text style={styles.avatarText}>{initials}</Text>
-          </LinearGradient>
-          <View style={{ marginLeft: 10 }}>
-            <Text style={styles.greetSmall}>{t("dashboard.greeting")}</Text>
-            <Text style={styles.greetName}>{user?.name ?? "Juan Luis"}</Text>
+          <View style={styles.avatarRing}>
+            <LinearGradient colors={colors.gradientBrand} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.avatar}>
+              <Text style={styles.avatarText}>{initials}</Text>
+            </LinearGradient>
+          </View>
+          <View style={{ marginLeft: 12 }}>
+            <Text style={styles.greetSmall}>{t(greetingKey())}</Text>
+            <Text style={styles.greetName}>{user?.name ?? "FinanceDAMT"}</Text>
           </View>
         </View>
 
@@ -180,29 +194,74 @@ export default function DashboardScreen() {
           accessibilityLabel={t("profile.notifications")}
           onPress={() => navigation.navigate("Notifications")}
         >
-          <Ionicons name="notifications-outline" size={22} color={colors.textSecondary} />
-          <View style={styles.unreadDot} />
+          <Ionicons name="notifications-outline" size={20} color={colors.textSecondary} />
+          {unreadCount > 0 ? <View style={styles.unreadDot} /> : null}
         </TouchableOpacity>
       </View>
 
-      <View style={styles.balanceCard}>
-        <Text style={styles.balanceCaption}>{t("accounts.netWorth").toUpperCase()}</Text>
-        <Text style={styles.balanceValue}>{formatMoney(data?.currentBalance ?? 0)}</Text>
+      <LinearGradient
+        colors={colors.gradientHero}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.balanceCard}
+      >
+        <View style={styles.balanceGlow} pointerEvents="none" />
 
-        <View style={styles.balanceRow}> 
-          <View style={styles.balanceMetric}> 
-            <Ionicons name="arrow-up" size={12} color={colors.income} />
-            <Text style={styles.metricLabel}>{t("dashboard.income")}</Text>
-            <Text style={[styles.metricValue, { color: colors.income }]}>+{formatMoney(data?.totalIncome ?? 0)}</Text>
-          </View>
-
-          <View style={styles.balanceMetric}> 
-            <Ionicons name="arrow-down" size={12} color={colors.expense} />
-            <Text style={styles.metricLabel}>{t("dashboard.expenses")}</Text>
-            <Text style={[styles.metricValue, { color: colors.expense }]}>-{formatMoney(data?.totalExpenses ?? 0)}</Text>
+        <View style={styles.balanceTopRow}>
+          <Text style={styles.balanceCaption}>{t("accounts.netWorth").toUpperCase()}</Text>
+          <View
+            style={[
+              styles.savingsPill,
+              {
+                borderColor: savingsPositive ? "rgba(0,230,160,0.35)" : "rgba(255,71,87,0.35)",
+                backgroundColor: savingsPositive ? "rgba(0,230,160,0.12)" : "rgba(255,71,87,0.12)",
+              },
+            ]}
+          >
+            <Ionicons
+              name={savingsPositive ? "trending-up" : "trending-down"}
+              size={12}
+              color={savingsPositive ? colors.income : colors.expense}
+            />
+            <Text style={[styles.savingsPillText, { color: savingsPositive ? colors.income : colors.expense }]}>
+              {trend.rate}%
+            </Text>
           </View>
         </View>
-      </View>
+
+        <AnimatedNumber
+          value={data?.currentBalance ?? 0}
+          formatter={formatMoney}
+          style={styles.balanceValue}
+          duration={1000}
+        />
+
+        <View style={styles.balanceDivider} />
+
+        <View style={styles.balanceRow}>
+          <View style={styles.balanceMetric}>
+            <View style={[styles.metricIcon, { backgroundColor: "rgba(0,230,160,0.14)" }]}>
+              <Ionicons name="arrow-up" size={13} color={colors.income} />
+            </View>
+            <View>
+              <Text style={styles.metricLabel}>{t("dashboard.income")}</Text>
+              <Text style={[styles.metricValue, { color: colors.income }]}>{formatMoney(data?.totalIncome ?? 0)}</Text>
+            </View>
+          </View>
+
+          <View style={styles.metricSeparator} />
+
+          <View style={styles.balanceMetric}>
+            <View style={[styles.metricIcon, { backgroundColor: "rgba(255,71,87,0.14)" }]}>
+              <Ionicons name="arrow-down" size={13} color={colors.expense} />
+            </View>
+            <View>
+              <Text style={styles.metricLabel}>{t("dashboard.expenses")}</Text>
+              <Text style={[styles.metricValue, { color: colors.expense }]}>{formatMoney(data?.totalExpenses ?? 0)}</Text>
+            </View>
+          </View>
+        </View>
+      </LinearGradient>
 
       <View style={styles.quickActionsWrap}>
         {QUICK_ACTIONS.map((item) => (
@@ -227,8 +286,8 @@ export default function DashboardScreen() {
               navigation.navigate("Chat");
             }}
           >
-            <View style={[styles.quickCircle, { backgroundColor: item.bg, borderColor: item.border }]}> 
-              <Ionicons name={item.icon} size={20} color={item.color} />
+            <View style={[styles.quickCircle, { backgroundColor: item.bg, borderColor: item.border }]}>
+              <Ionicons name={item.icon} size={22} color={item.color} />
             </View>
             <Text style={styles.quickLabel}>{t(item.labelKey)}</Text>
           </TouchableOpacity>
@@ -425,8 +484,8 @@ export default function DashboardScreen() {
               style={styles.txItem}
               onPress={() => navigation.navigate("TransactionDetail", { transaction: item })}
             >
-              <View style={[styles.txIconBox, { backgroundColor: `${item.categoryColor}26` }]}> 
-                <Text style={styles.txIcon}>{item.categoryIcon || "•"}</Text>
+              <View style={[styles.txIconBox, { backgroundColor: `${item.categoryColor}26` }]}>
+                <Text style={styles.txIcon}>{getCategoryDisplay(item.categoryName, item.categoryColor).emoji}</Text>
               </View>
 
               <View style={styles.txMain}>
@@ -484,10 +543,16 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
+  avatarRing: {
+    padding: 2,
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: colors.hairline,
+  },
   avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -504,69 +569,118 @@ const styles = StyleSheet.create({
   greetName: {
     marginTop: 1,
     color: colors.textPrimary,
-    fontSize: 16,
+    fontSize: 17,
     fontFamily: typography.fontFamily.headingSemiBold,
   },
   bellBtn: {
-    width: 40,
-    height: 40,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
     alignItems: "center",
     justifyContent: "center",
+    borderWidth: 1,
+    borderColor: colors.hairline,
+    backgroundColor: colors.glass,
   },
   unreadDot: {
     position: "absolute",
-    top: 9,
-    right: 8,
+    top: 10,
+    right: 11,
     width: 8,
     height: 8,
     borderRadius: 4,
     backgroundColor: colors.expense,
+    borderWidth: 1.5,
+    borderColor: colors.bg,
   },
   balanceCard: {
     marginHorizontal: 20,
-    marginTop: 16,
-    backgroundColor: colors.bgCard,
-    borderColor: colors.bgCardBorder,
+    marginTop: 18,
+    borderRadius: 24,
+    padding: 22,
     borderWidth: 1,
-    borderRadius: 20,
-    padding: 20,
+    borderColor: colors.hairline,
+    overflow: "hidden",
+  },
+  balanceGlow: {
+    position: "absolute",
+    top: -50,
+    right: -40,
+    width: 170,
+    height: 170,
+    borderRadius: 85,
+    backgroundColor: colors.emeraldGlow,
+  },
+  balanceTopRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   balanceCaption: {
-    color: colors.textSecondary,
+    color: "rgba(255,255,255,0.55)",
     fontSize: 11,
     fontFamily: typography.fontFamily.bodyMedium,
-    letterSpacing: 1.5,
+    letterSpacing: 1.6,
+  },
+  savingsPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    borderWidth: 1,
+    borderRadius: 99,
+    paddingHorizontal: 9,
+    paddingVertical: 4,
+  },
+  savingsPillText: {
+    fontSize: 12,
+    fontFamily: typography.fontFamily.monoSemiBold,
   },
   balanceValue: {
-    marginTop: 8,
-    color: colors.textPrimary,
-    fontSize: 36,
+    marginTop: 10,
+    color: "#FFFFFF",
+    fontSize: 38,
     fontFamily: typography.fontFamily.monoExtraBold,
   },
+  balanceDivider: {
+    height: 1,
+    backgroundColor: colors.hairline,
+    marginVertical: 16,
+  },
   balanceRow: {
-    marginTop: 14,
     flexDirection: "row",
-    gap: 20,
+    alignItems: "center",
   },
   balanceMetric: {
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    gap: 4,
-    flexWrap: "wrap",
+    gap: 10,
+  },
+  metricIcon: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  metricSeparator: {
+    width: 1,
+    height: 30,
+    backgroundColor: colors.hairline,
+    marginHorizontal: 12,
   },
   metricLabel: {
-    color: colors.textSecondary,
+    color: "rgba(255,255,255,0.5)",
     fontSize: 11,
     fontFamily: typography.fontFamily.body,
   },
   metricValue: {
-    width: "100%",
-    fontSize: 14,
+    marginTop: 2,
+    fontSize: 15,
     fontFamily: typography.fontFamily.monoSemiBold,
   },
   quickActionsWrap: {
-    marginTop: 20,
+    marginTop: 22,
     paddingHorizontal: 20,
     flexDirection: "row",
     justifyContent: "space-between",
@@ -576,18 +690,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   quickCircle: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 56,
+    height: 56,
+    borderRadius: 18,
     borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
   },
   quickLabel: {
-    marginTop: 6,
+    marginTop: 8,
     color: colors.textSecondary,
     fontSize: 11,
-    fontFamily: typography.fontFamily.body,
+    fontFamily: typography.fontFamily.bodyMedium,
   },
   sectionWrap: {
     marginTop: 24,
