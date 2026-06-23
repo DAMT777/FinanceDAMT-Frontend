@@ -9,10 +9,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "../constants/colors";
 import { AppStackParams } from "../navigation/types";
 
-/**
- * Persistent AI assistant button. Rendered above the tab navigator so the full
- * chat is reachable from any main section of the app.
- */
 export default function FloatingAIButton() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();

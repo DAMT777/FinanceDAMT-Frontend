@@ -72,10 +72,8 @@ export default function TransactionDetailScreen() {
   return (
     <>
       <ScrollView style={styles.root} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Drag handle */}
         <View style={styles.dragHandle} />
 
-        {/* Header row */}
         <View style={styles.headerRow}>
           <Text style={styles.title}>{t("transactions.title")}</Text>
           <Pressable onPress={() => navigation.goBack()} style={styles.closeBtn}>
@@ -83,7 +81,6 @@ export default function TransactionDetailScreen() {
           </Pressable>
         </View>
 
-        {/* Amount hero */}
         <LinearGradient
           colors={transaction.type === "Income" ? ["#0D2818", "#0D1228"] : transaction.type === "Expense" ? ["#200D0D", "#0D1228"] : ["#0D1520", "#0D1228"]}
           style={styles.heroCard}
@@ -97,7 +94,6 @@ export default function TransactionDetailScreen() {
           <Text style={styles.heroDate}>{formatDateTime(transaction.date)}</Text>
         </LinearGradient>
 
-        {/* Detail rows */}
         <View style={styles.detailCard}>
           <DetailRow label={t("transactions.type")} value={typeLabelMap[transaction.type]} />
           <Divider />
@@ -127,7 +123,6 @@ export default function TransactionDetailScreen() {
           <Text style={styles.editBtnText}>{t("common.edit")}</Text>
         </Pressable>
 
-        {/* Delete button */}
         <Pressable
           onPress={() => setShowDeleteDialog(true)}
           style={styles.deleteBtn}

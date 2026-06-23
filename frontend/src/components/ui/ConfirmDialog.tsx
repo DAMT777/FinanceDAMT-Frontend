@@ -45,7 +45,6 @@ export default function ConfirmDialog({
       cardScale.value = withTiming(0.9, { duration: 160 });
       cardOpacity.value = withTiming(0, { duration: 160 });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible]);
 
   const overlayStyle = useAnimatedStyle(() => ({

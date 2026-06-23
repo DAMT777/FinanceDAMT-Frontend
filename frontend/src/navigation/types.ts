@@ -19,7 +19,6 @@ export type AppTabParams = {
   Profile: undefined;
 };
 
-/** Modal and detail screens that sit on top of the tab navigator */
 export type AppStackParams = {
   Tabs: NavigatorScreenParams<AppTabParams>;
   Accounts: undefined;

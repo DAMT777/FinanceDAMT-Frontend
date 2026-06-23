@@ -7,13 +7,10 @@ import { typography } from "../../constants/typography";
 import { TrendBucket } from "../../utils/trendBuckets";
 
 interface IncomeExpenseChartProps {
-  /** Pre-bucketed income/expense series (one entry per bar group). */
   points: TrendBucket[];
-  /** Compact currency formatter for the tooltip / reference values. */
   formatShort: (value: number) => string;
 }
 
-/** Rounds a value up to a "nice" axis maximum so bars never touch the top. */
 function niceMax(value: number): number {
   if (value <= 0) return 1000;
   const magnitude = Math.pow(10, Math.floor(Math.log10(value)));
@@ -26,7 +23,6 @@ export default function IncomeExpenseChart({ points, formatShort }: IncomeExpens
   const { t } = useTranslation();
   const screenWidth = Dimensions.get("window").width;
 
-  // Bar geometry shrinks as the number of groups grows so 12 months still fit.
   const groupCount = Math.max(1, points.length);
   const dense = groupCount > 6;
   const barWidth = dense ? 6 : 9;
@@ -72,7 +68,6 @@ export default function IncomeExpenseChart({ points, formatShort }: IncomeExpens
         count: groupCount,
       })}
     >
-      {/* Legend — establishes meaning before the chart (proximity + hierarchy) */}
       <View style={styles.legend}>
         <View style={styles.legendItem}>
           <View style={[styles.legendDot, { backgroundColor: colors.income }]} />

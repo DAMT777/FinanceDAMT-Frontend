@@ -37,7 +37,6 @@ function TabItem({ label, icon, isActive, onPress }: TabItemProps) {
   useEffect(() => {
     dotScale.value = withSpring(isActive ? 1 : 0, { damping: 14, stiffness: 220 });
     dotOpacity.value = withSpring(isActive ? 1 : 0, { damping: 14 });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isActive]);
 
   const iconStyle = useAnimatedStyle(() => ({
@@ -77,7 +76,6 @@ function CenterFab({ onPress }: { onPress: () => void }) {
 
   useEffect(() => {
     scale.value = withSpring(1, { damping: 8, stiffness: 150 });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const mountStyle = useAnimatedStyle(() => ({

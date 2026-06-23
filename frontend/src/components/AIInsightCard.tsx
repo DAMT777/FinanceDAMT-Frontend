@@ -15,7 +15,6 @@ export default function AIInsightCard({ insight, onAskAI }: AIInsightCardProps) 
   const { t } = useTranslation();
   return (
     <LinearGradient colors={["#130D2B", "#0D0820"]} style={styles.card}>
-      {/* Decorative glow top-right */}
       <View style={styles.glow} />
 
       <View style={styles.labelRow}>

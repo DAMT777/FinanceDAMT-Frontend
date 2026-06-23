@@ -11,8 +11,6 @@ import SplashScreen from "../screens/auth/SplashScreen";
 
 const RootStack = createNativeStackNavigator<RootStackParams>();
 
-// Dark navigation theme so scene/background areas (e.g. behind the system
-// navigation bar) never flash the default white background.
 const navTheme: Theme = {
   ...DarkTheme,
   colors: {

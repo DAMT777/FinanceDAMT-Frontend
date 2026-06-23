@@ -454,4 +454,3 @@ const styles = StyleSheet.create({
     fontFamily: typography.fontFamily.headingSemiBold,
   },
 });
-

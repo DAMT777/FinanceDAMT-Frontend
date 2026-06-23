@@ -7,11 +7,9 @@ import { typography } from "../../constants/typography";
 import { moderateScale, scale } from "../../utils/responsive";
 
 interface DatePickerFieldProps {
-  /** Selected date as "YYYY-MM-DD", or "" when none. */
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
-  /** Earliest selectable date (days before it are disabled). */
   minimumDate?: Date;
 }
 
@@ -19,7 +17,6 @@ function pad(n: number): string {
   return n < 10 ? `0${n}` : String(n);
 }
 
-/** Local "YYYY-MM-DD" for a date, avoiding UTC shifts from toISOString(). */
 function toKey(date: Date): string {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 }
@@ -59,7 +56,6 @@ export default function DatePickerField({
 
   const cells = useMemo(() => {
     const first = startOfMonth(viewDate);
-    // Convert JS Sunday-first (0..6) to a Monday-first offset.
     const leading = (first.getDay() + 6) % 7;
     const total = daysInMonth(viewDate);
     const list: (Date | null)[] = [];

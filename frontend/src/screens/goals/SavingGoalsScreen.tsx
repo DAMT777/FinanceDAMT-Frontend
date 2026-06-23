@@ -49,13 +49,11 @@ export default function SavingGoalsScreen() {
   const totalTarget = goals.reduce((acc, item) => acc + item.targetAmount, 0);
   const overallProgress = safePercentage(totalSaved, totalTarget);
 
-  // Screen entrance
   const opacity = useSharedValue(0);
   const translateY = useSharedValue(16);
   useEffect(() => {
     opacity.value = withTiming(1, { duration: 280 });
     translateY.value = withSpring(0, { damping: 20, stiffness: 300 });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const rootStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
@@ -74,7 +72,6 @@ export default function SavingGoalsScreen() {
       >
         <Text style={styles.title}>{t("goals.title")}</Text>
 
-        {/* Summary card */}
         <LinearGradient colors={["#0D1F14", "#0D1228"]} style={styles.summaryCard}>
           <View style={styles.summaryInner}>
             <View style={styles.summaryLeft}>
@@ -98,7 +95,6 @@ export default function SavingGoalsScreen() {
           </View>
         </LinearGradient>
 
-        {/* Goal list */}
         {goals.length ? (
           <View style={styles.goalList}>
             {goals.map((goal) => {
@@ -130,7 +126,6 @@ export default function SavingGoalsScreen() {
                     ) : null}
                   </View>
 
-                  {/* Progress bar */}
                   <View style={styles.track}>
                     <LinearGradient
                       colors={
@@ -198,7 +193,6 @@ const styles = StyleSheet.create({
     fontFamily: typography.fontFamily.heading,
     fontWeight: "700",
   },
-  // Summary card
   summaryCard: {
     borderRadius: 20,
     borderWidth: 1,
@@ -230,7 +224,6 @@ const styles = StyleSheet.create({
     fontFamily: typography.fontFamily.body,
     fontSize: 12,
   },
-  // Goal list
   goalList: {
     gap: spacing.md,
   },
@@ -326,7 +319,6 @@ const styles = StyleSheet.create({
     fontFamily: typography.fontFamily.headingSemiBold,
     fontSize: 13,
   },
-  // Add button
   addGoalBtn: {
     flexDirection: "row",
     alignItems: "center",

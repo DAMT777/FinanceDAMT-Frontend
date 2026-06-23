@@ -47,7 +47,6 @@ export default function NotificationsScreen() {
 
   return (
     <View style={styles.root}>
-      {/* Header */}
       <View style={styles.header}>
         <Pressable onPress={() => navigation.goBack()} style={styles.backBtn} accessibilityRole="button">
           <Ionicons name="arrow-back" size={22} color={colors.textPrimary} />

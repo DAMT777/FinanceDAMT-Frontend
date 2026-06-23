@@ -86,13 +86,11 @@ export default function TransactionListScreen() {
 
   const sections = useMemo(() => groupTransactions(filtered), [filtered]);
 
-  // Screen entrance
   const screenOpacity = useSharedValue(0);
   const screenY = useSharedValue(16);
   useEffect(() => {
     screenOpacity.value = withTiming(1, { duration: 280 });
     screenY.value = withSpring(0, { damping: 20 });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const screenStyle = useAnimatedStyle(() => ({
     opacity: screenOpacity.value,
@@ -101,7 +99,6 @@ export default function TransactionListScreen() {
 
   return (
     <Animated.View style={[styles.container, { paddingTop: insets.top + spacing.sm }, screenStyle]}>
-      {/* Header */}
       <View style={styles.headerWrap}>
         <Text style={styles.title}>{t("transactions.title")}</Text>
         <Text style={styles.subtitle}>
@@ -109,7 +106,6 @@ export default function TransactionListScreen() {
         </Text>
       </View>
 
-      {/* Search bar */}
       <View style={styles.searchBar}>
         <Ionicons name="search-outline" size={18} color={colors.textMuted} />
         <TextInput
@@ -129,7 +125,6 @@ export default function TransactionListScreen() {
         </Pressable>
       </View>
 
-      {/* Filter chips */}
       <View style={styles.filtersRow}>
         {FILTER_CHIPS.map(({ labelKey, value }) => {
           const active = typeFilter === value;
@@ -159,7 +154,6 @@ export default function TransactionListScreen() {
         })}
       </View>
 
-      {/* List */}
       {isLoading ? (
         <View style={styles.emptyWrap}>
           <Text style={styles.loadingText}>{t("transactions.loading")}</Text>

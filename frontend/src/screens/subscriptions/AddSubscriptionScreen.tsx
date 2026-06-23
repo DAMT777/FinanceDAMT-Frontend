@@ -88,7 +88,6 @@ export default function AddSubscriptionScreen() {
           </Pressable>
         </View>
 
-        {/* Emoji picker */}
         <View style={styles.fieldGroup}>
           <Text style={styles.label}>{t("subscriptions.selectIcon")}</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.emojiRow}>
@@ -104,7 +103,6 @@ export default function AddSubscriptionScreen() {
           </ScrollView>
         </View>
 
-        {/* Name */}
         <View style={styles.fieldGroup}>
           <Text style={styles.label}>{t("subscriptions.name")}</Text>
           <TextInput
@@ -117,7 +115,6 @@ export default function AddSubscriptionScreen() {
           />
         </View>
 
-        {/* Amount */}
         <View style={styles.fieldGroup}>
           <Text style={styles.label}>{t("subscriptions.amount")}</Text>
           <TextInput
@@ -130,7 +127,6 @@ export default function AddSubscriptionScreen() {
           />
         </View>
 
-        {/* Billing cycle */}
         <View style={styles.fieldGroup}>
           <Text style={styles.label}>{t("subscriptions.billingCycle")}</Text>
           <View style={styles.cycleRow}>
@@ -151,7 +147,6 @@ export default function AddSubscriptionScreen() {
           </View>
         </View>
 
-        {/* Next billing date */}
         <View style={styles.fieldGroup}>
           <Text style={styles.label}>{t("subscriptions.nextBillingDate")}</Text>
           <DatePickerField
@@ -161,7 +156,6 @@ export default function AddSubscriptionScreen() {
           />
         </View>
 
-        {/* Save button */}
         <Pressable
           onPress={() => void handleSave()}
           disabled={!isValid || createSubscription.isPending}

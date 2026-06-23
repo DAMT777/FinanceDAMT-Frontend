@@ -171,7 +171,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.bg,
   },
-  // Decorative orbs
   orb1: {
     position: "absolute",
     width: 280,

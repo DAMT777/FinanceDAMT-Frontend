@@ -1,7 +1,5 @@
 import { scale } from "../utils/responsive";
 
-// Values are scaled to the device width so layouts breathe consistently across
-// small phones, large phones and tablets. Authored against a 375pt baseline.
 export const spacing = {
   xxs: scale(4),
   xs: scale(8),

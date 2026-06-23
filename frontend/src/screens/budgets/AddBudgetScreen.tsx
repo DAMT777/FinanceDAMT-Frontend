@@ -24,9 +24,6 @@ import { getApiErrorMessage } from "../../utils/apiError";
 import { getCategoryDisplay } from "../../utils/categoryIcons";
 import { CategoryDto } from "../../types/api";
 
-// API categories carry an `icon` that may be a real emoji or a Lucide-style
-// name ("shirt", "book-open"). Only emojis (non-ASCII) should render directly;
-// otherwise fall back to the emoji mapped from the category name.
 function categoryEmoji(cat: CategoryDto): string {
   const icon = cat.icon ?? "";
   const isEmoji = [...icon].some((ch) => (ch.codePointAt(0) ?? 0) > 127);
@@ -301,4 +298,3 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
   },
 });
-

@@ -68,7 +68,6 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
   const loginAction = useAuthStore((state) => state.login);
   const showToast = useUIStore((state) => state.showToast);
 
-  // Entrance animations
   const contentOpacity = useSharedValue(0);
   const contentY = useSharedValue(20);
   const btnScale = useSharedValue(0.9);
@@ -77,7 +76,6 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
     contentOpacity.value = withTiming(1, { duration: 320 });
     contentY.value = withSpring(0, { damping: 20 });
     btnScale.value = withDelay(350, withSpring(1, { damping: 16 }));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const contentStyle = useAnimatedStyle(() => ({
@@ -106,7 +104,6 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
     t("auth.passwordStrength.strong"),
   ];
 
-
   const password = watch("password");
   const strength = useMemo(() => getPasswordStrength(password), [password]);
 
@@ -134,7 +131,6 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
 
   return (
     <View style={styles.screen}>
-      {/* Decorative orbs */}
       <View style={styles.orb1} />
       <View style={styles.orb2} />
       <View style={styles.orb3} />
@@ -148,7 +144,6 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          {/* Brand */}
           <View style={styles.brandRow}>
             <View style={styles.logoCircle}>
               <Text style={styles.logoText}>$</Text>
@@ -213,7 +208,6 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
                 )}
               />
 
-              {/* Password strength bar */}
               <View style={styles.strengthWrap}>
                 <View style={styles.strengthBar}>
                   {[1, 2, 3, 4].map((segment) => {
@@ -259,7 +253,6 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
                 )}
               />
 
-              {/* Create Account gradient button */}
               <Animated.View style={btnAnimStyle}>
                 <Pressable
                   onPress={() => void onSubmit()}

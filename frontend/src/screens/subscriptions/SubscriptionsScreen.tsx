@@ -48,13 +48,11 @@ export default function SubscriptionsScreen() {
   const cycleLabel = (cycle: BillingCycle): string =>
     t(`subscriptions.cycle.${cycle.toLowerCase()}`);
 
-  // Screen entrance
   const opacity = useSharedValue(0);
   const translateY = useSharedValue(16);
   useEffect(() => {
     opacity.value = withTiming(1, { duration: 280 });
     translateY.value = withSpring(0, { damping: 20, stiffness: 300 });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const rootStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
@@ -89,7 +87,6 @@ export default function SubscriptionsScreen() {
             <View style={styles.backBtn} />
           </View>
 
-          {/* Summary card */}
           <LinearGradient colors={["#1A1430", "#0D1228"]} style={styles.summaryCard}>
             <Text style={styles.summaryLabel}>{t("subscriptions.monthlyTotal")}</Text>
             <AnimatedNumber
@@ -108,7 +105,6 @@ export default function SubscriptionsScreen() {
             </View>
           </LinearGradient>
 
-          {/* Subscription list */}
           {subscriptions.length ? (
             <View style={styles.list}>
               {subscriptions.map((sub) => {
@@ -211,7 +207,6 @@ const styles = StyleSheet.create({
     fontFamily: typography.fontFamily.heading,
     fontWeight: "700",
   },
-  // Summary
   summaryCard: {
     borderRadius: 20,
     borderWidth: 1,
@@ -241,7 +236,6 @@ const styles = StyleSheet.create({
     fontFamily: typography.fontFamily.body,
     fontSize: 12,
   },
-  // List
   list: {
     gap: spacing.sm,
   },
@@ -316,7 +310,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  // Add button
   addBtn: {
     flexDirection: "row",
     alignItems: "center",

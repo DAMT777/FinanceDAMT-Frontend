@@ -66,8 +66,6 @@ export default function ChatScreen() {
 
   const suggestions = [t("ai.suggestion1"), t("ai.suggestion2"), t("ai.suggestion3")];
 
-  // The backend agent decides what to do with each message: generate a report,
-  // store a money movement described in natural language, or chat normally.
   const onSend = async () => {
     const trimmed = input.trim();
     if (!trimmed || chatMutation.isPending) return;

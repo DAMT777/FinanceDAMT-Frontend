@@ -7,7 +7,7 @@ import { colors } from "../constants/colors";
 interface ProgressRingProps {
   size?: number;
   strokeWidth?: number;
-  progress: number; // 0-100
+  progress: number;
   color?: string;
   trackColor?: string;
   label?: string;
@@ -51,7 +51,6 @@ export default function ProgressRing({
     return () => {
       if (frameRef.current !== null) cancelAnimationFrame(frameRef.current);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [progress, duration]);
 
   const clampedProgress = Math.min(100, Math.max(0, animatedProgress));
@@ -60,7 +59,6 @@ export default function ProgressRing({
   return (
     <View style={{ width: size, height: size, alignItems: "center", justifyContent: "center" }}>
       <Svg width={size} height={size} style={{ position: "absolute" }}>
-        {/* Track */}
         <Circle
           cx={size / 2}
           cy={size / 2}
@@ -69,7 +67,6 @@ export default function ProgressRing({
           strokeWidth={strokeWidth}
           fill="none"
         />
-        {/* Progress */}
         <Circle
           cx={size / 2}
           cy={size / 2}

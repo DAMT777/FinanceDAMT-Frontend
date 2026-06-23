@@ -12,8 +12,6 @@ export const fontFamily = {
 
 import { moderateScale } from "../utils/responsive";
 
-// Font sizes and line heights are moderately scaled to the device width so text
-// shrinks on compact phones and grows on large ones without becoming oversized.
 export const fontSize = {
   xs: moderateScale(12),
   sm: moderateScale(14),

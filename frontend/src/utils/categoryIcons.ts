@@ -4,7 +4,6 @@ export interface CategoryDisplay {
 }
 
 export const categoryIconMap: Record<string, CategoryDisplay> = {
-  // Income
   Salary:         { emoji: "💼", color: "#00D68F" },
   Freelance:      { emoji: "💻", color: "#00B4D8" },
   Investment:     { emoji: "📈", color: "#6C63FF" },
@@ -12,7 +11,6 @@ export const categoryIconMap: Record<string, CategoryDisplay> = {
   Bonus:          { emoji: "🎁", color: "#00D68F" },
   Rental:         { emoji: "🏠", color: "#4ECDC4" },
 
-  // Expense
   Food:           { emoji: "🍔", color: "#FF6B6B" },
   Transport:      { emoji: "🚗", color: "#4ECDC4" },
   Housing:        { emoji: "🏠", color: "#FFE66D" },

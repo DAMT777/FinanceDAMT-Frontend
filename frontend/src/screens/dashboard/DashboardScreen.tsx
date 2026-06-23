@@ -84,7 +84,6 @@ function formatShortMoney(value: number): string {
   return formatMoney(value);
 }
 
-/** Time-aware greeting key for a friendlier, more human header. */
 function greetingKey(): string {
   const hour = new Date().getHours();
   if (hour < 12) return "dashboard.greeting";
@@ -111,8 +110,6 @@ export default function DashboardScreen() {
     queryFn: savingGoalsApi.getSavingGoals,
   });
 
-  // Chart data is computed from dated transactions so any window (day → year)
-  // can be bucketed by day, week or month as appropriate.
   const chartDateFrom = useMemo(() => rangeStart(chartRange).toISOString(), [chartRange]);
   const chartTxQuery = useTransactions({ dateFrom: chartDateFrom, pageSize: 1000 });
 
@@ -295,13 +292,11 @@ export default function DashboardScreen() {
         ))}
       </View>
 
-      {/* ── Income vs Expenses ─────────────────────────────────────────── */}
       <View style={styles.sectionWrap}>
         <View style={styles.sectionHead}>
           <Text style={styles.sectionTitle}>{t("dashboard.incomeVsExpenses")}</Text>
         </View>
 
-        {/* Period selector — full set of windows (1D · 1S · 1M · 3M · 6M · 1A) */}
         <View style={styles.periodToggle} accessibilityRole="tablist">
           {CHART_RANGES.map((range) => {
             const active = chartRange === range;
@@ -323,7 +318,6 @@ export default function DashboardScreen() {
         </View>
 
         <View style={styles.chartCard}>
-          {/* Net savings headline — strongest element in the card (hierarchy) */}
           <View style={styles.ieTopRow}>
             <View>
               <Text style={styles.ieNetLabel}>{t("dashboard.netSavings")}</Text>
@@ -393,6 +387,7 @@ export default function DashboardScreen() {
                 donut
                 radius={60}
                 innerRadius={40}
+                innerCircleColor={colors.bgCard}
                 centerLabelComponent={() => (
                   <View style={{ alignItems: "center" }}>
                     <Text style={styles.chartCenterAmount}>{formatShortMoney(monthTotal)}</Text>
@@ -738,7 +733,6 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 16,
   },
-  // Period selector (progressive disclosure)
   periodToggle: {
     flexDirection: "row",
     backgroundColor: colors.bgCardAlt,
@@ -767,7 +761,6 @@ const styles = StyleSheet.create({
     color: colors.textInverse,
     fontFamily: typography.fontFamily.headingSemiBold,
   },
-  // Income vs Expenses card internals
   ieTopRow: {
     flexDirection: "row",
     justifyContent: "space-between",

@@ -66,10 +66,8 @@ export default function AddAccountScreen() {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        {/* Drag handle */}
         <View style={styles.dragHandle} />
 
-        {/* Header */}
         <View style={styles.headerRow}>
           <Text style={styles.title}>{t("accounts.newAccount")}</Text>
           <Pressable onPress={() => navigation.goBack()} style={styles.closeBtn}>
@@ -77,7 +75,6 @@ export default function AddAccountScreen() {
           </Pressable>
         </View>
 
-        {/* Account type */}
         <View style={styles.fieldGroup}>
           <Text style={styles.label}>{t("accounts.type")}</Text>
           <View style={styles.typeRow}>
@@ -100,7 +97,6 @@ export default function AddAccountScreen() {
           </View>
         </View>
 
-        {/* Name */}
         <View style={styles.fieldGroup}>
           <Text style={styles.label}>{t("accounts.accountName")}</Text>
           <TextInput
@@ -113,7 +109,6 @@ export default function AddAccountScreen() {
           />
         </View>
 
-        {/* Balance */}
         <View style={styles.fieldGroup}>
           <Text style={styles.label}>
             {type === "Credit" ? t("accounts.currentDebtOrBalance") : t("accounts.initialBalance")}
@@ -128,7 +123,6 @@ export default function AddAccountScreen() {
           />
         </View>
 
-        {/* Credit limit — only for Credit */}
         {type === "Credit" ? (
           <View style={styles.fieldGroup}>
             <Text style={styles.label}>{t("accounts.creditLimit")}</Text>
@@ -143,7 +137,6 @@ export default function AddAccountScreen() {
           </View>
         ) : null}
 
-        {/* Save button */}
         <Pressable
           onPress={() => void handleSave()}
           disabled={!isValid || createAccount.isPending}

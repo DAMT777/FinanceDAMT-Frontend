@@ -1,4 +1,3 @@
-// Auth
 export interface LoginResponse {
   accessToken: string;
   refreshToken: string;
@@ -19,7 +18,6 @@ export interface LoginRequest {
   password: string;
 }
 
-// User / Survey
 export type FinancialProfile = "Conservative" | "Balanced" | "AtRisk";
 
 export interface UserProfile {
@@ -41,7 +39,6 @@ export interface SurveyRequest {
   savingsLevel: string;
 }
 
-// Accounts
 export type AccountType = "Cash" | "Bank" | "Credit";
 
 export interface AccountDto {
@@ -77,7 +74,6 @@ export interface NetWorthDto {
   netWorth: number;
 }
 
-// Categories
 export type TransactionType = "Income" | "Expense" | "Transfer";
 
 export interface CategoryDto {
@@ -98,7 +94,6 @@ export interface CreateCategoryRequest {
 
 export interface UpdateCategoryRequest extends Partial<CreateCategoryRequest> {}
 
-// Transactions
 export interface TransactionDto {
   id: string;
   accountId: string;
@@ -147,7 +142,6 @@ export interface PaginatedResult<T> {
   totalPages: number;
 }
 
-// Dashboard
 export interface DashboardSummaryDto {
   totalIncome: number;
   totalExpenses: number;
@@ -191,7 +185,6 @@ export interface HeatmapDayDto {
   intensity: number;
 }
 
-// Budgets
 export interface BudgetDto {
   id: string;
   categoryId: string;
@@ -214,7 +207,6 @@ export interface SetBudgetRequest {
   year?: number;
 }
 
-// Saving Goals
 export interface SavingGoalDto {
   id: string;
   name: string;
@@ -243,7 +235,6 @@ export interface AddContributionRequest {
 
 export interface UpdateSavingGoalRequest extends Partial<CreateSavingGoalRequest> {}
 
-// Subscriptions
 export type BillingCycle = "Weekly" | "Monthly" | "Quarterly" | "Yearly";
 
 export interface SubscriptionDto {
@@ -277,7 +268,6 @@ export interface UpdateSubscriptionRequest {
   notes?: string;
 }
 
-// Notifications
 export type NotificationType =
   | "General"
   | "BudgetAlert"
@@ -295,7 +285,6 @@ export interface NotificationDto {
   createdAt: string;
 }
 
-// AI
 export interface ChatMessageDto {
   role: "user" | "assistant";
   content: string;
@@ -351,7 +340,6 @@ export interface ParseExpenseResult {
   categoryName: string;
 }
 
-// Debts
 export interface DebtDto {
   id: string;
   description: string;

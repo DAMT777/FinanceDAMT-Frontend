@@ -43,7 +43,6 @@ export default function AddGoalScreen() {
   const handleSave = async () => {
     if (!isValid) return;
     try {
-      // deadline expects ISO string; parse simple date input YYYY-MM-DD
       const deadlineDate = new Date(deadline);
       if (isNaN(deadlineDate.getTime())) {
         showToast(t("goals.invalidDate"), "warning");
@@ -81,7 +80,6 @@ export default function AddGoalScreen() {
           </Pressable>
         </View>
 
-        {/* Emoji picker */}
         <View style={styles.fieldGroup}>
           <Text style={styles.label}>{t("goals.selectEmoji")}</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.emojiRow}>
@@ -100,7 +98,6 @@ export default function AddGoalScreen() {
           </ScrollView>
         </View>
 
-        {/* Goal name */}
         <View style={styles.fieldGroup}>
           <Text style={styles.label}>{t("goals.goalName")}</Text>
           <TextInput
@@ -113,7 +110,6 @@ export default function AddGoalScreen() {
           />
         </View>
 
-        {/* Target amount */}
         <View style={styles.fieldGroup}>
           <Text style={styles.label}>{t("goals.targetAmount")}</Text>
           <TextInput
@@ -126,7 +122,6 @@ export default function AddGoalScreen() {
           />
         </View>
 
-        {/* Deadline */}
         <View style={styles.fieldGroup}>
           <Text style={styles.label}>{t("goals.deadlineFormat")}</Text>
           <DatePickerField
@@ -136,7 +131,6 @@ export default function AddGoalScreen() {
           />
         </View>
 
-        {/* Save button */}
         <Pressable
           onPress={() => void handleSave()}
           disabled={!isValid || createGoal.isPending}

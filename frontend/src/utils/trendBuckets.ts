@@ -1,11 +1,9 @@
 import { TransactionDto } from "../types/api";
 
-// Selectable chart windows, ordered as shown in the UI.
 export type ChartRange = "1d" | "1w" | "1m" | "3m" | "6m" | "1y";
 
 export const CHART_RANGES: ChartRange[] = ["1d", "1w", "1m", "3m", "6m", "1y"];
 
-// Short labels for the period selector (language-neutral codes).
 export const CHART_RANGE_LABELS: Record<ChartRange, string> = {
   "1d": "1D",
   "1w": "1S",
@@ -23,7 +21,6 @@ export interface TrendBucket {
 
 type Unit = "day" | "week" | "month";
 
-// How each range is sliced: unit of each bar and how many bars to show.
 const RANGE_CONFIG: Record<ChartRange, { unit: Unit; count: number }> = {
   "1d": { unit: "day", count: 1 },
   "1w": { unit: "day", count: 7 },
@@ -44,12 +41,10 @@ function shortMonth(date: Date, locale: string): string {
 }
 
 function dayLabel(date: Date, locale: string, count: number): string {
-  // A single-day window shows the date; a week of days shows weekday names.
   if (count <= 1) return `${date.getDate()} ${shortMonth(date, locale)}`;
   return date.toLocaleDateString(locale, { weekday: "short" }).replace(".", "");
 }
 
-/** Earliest date that needs to be fetched to fill the chart for `range`. */
 export function rangeStart(range: ChartRange, now: Date = new Date()): Date {
   const { unit, count } = RANGE_CONFIG[range];
   const start = startOfDay(now);
@@ -64,11 +59,6 @@ export function rangeStart(range: ChartRange, now: Date = new Date()): Date {
   return start;
 }
 
-/**
- * Buckets `transactions` into a fixed series of income/expense totals for the
- * given range. Empty buckets are kept (rendered as zero bars) so the axis stays
- * stable. Built backwards from `now` so the last bucket is always the present.
- */
 export function buildTrendBuckets(
   transactions: TransactionDto[],
   range: ChartRange,
@@ -79,7 +69,6 @@ export function buildTrendBuckets(
   const today = startOfDay(now);
 
   const buckets = Array.from({ length: count }, (_, idx) => {
-    // idx 0 = oldest bucket, idx count-1 = most recent.
     const i = count - 1 - idx;
     let start: Date;
     let end: Date;

@@ -33,7 +33,6 @@ export default function AnimatedNumber({
       }
       const elapsed = timestamp - startTimeRef.current;
       const progress = Math.min(elapsed / duration, 1);
-      // Ease out cubic
       const eased = 1 - Math.pow(1 - progress, 3);
       const current = startValueRef.current + (value - startValueRef.current) * eased;
       setDisplayed(current);
@@ -50,7 +49,6 @@ export default function AnimatedNumber({
         cancelAnimationFrame(frameRef.current);
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value, duration]);
 
   const display = formatter
