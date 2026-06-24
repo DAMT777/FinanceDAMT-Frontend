@@ -2,6 +2,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { colors } from "../constants/colors";
 import { spacing } from "../constants/spacing";
 import { typography } from "../constants/typography";
+import { makeStyles } from "../theme/styles";
 
 interface CategoryBadgeProps {
   name: string;
@@ -33,7 +34,7 @@ export default function CategoryBadge({ name, icon, color, selected = false, onP
   );
 }
 
-const styles = StyleSheet.create({
+const styles = makeStyles((colors) => ({
   badge: {
     flexDirection: "row",
     alignItems: "center",
@@ -65,4 +66,4 @@ const styles = StyleSheet.create({
     fontFamily: typography.fontFamily.bodyMedium,
     fontSize: typography.fontSize.xs,
   },
-});
+}));

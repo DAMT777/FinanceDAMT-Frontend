@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { AxiosError } from "axios";
 import { z } from "zod";
 import { authApi } from "../../api/auth";
 import Input from "../../components/ui/Input";
@@ -14,6 +15,7 @@ import { typography } from "../../constants/typography";
 import { useAuthStore } from "../../store/authStore";
 import { useUIStore } from "../../store/uiStore";
 import { getApiErrorMessage } from "../../utils/apiError";
+import { makeStyles } from "../../theme/styles";
 
 const buildLoginSchema = (t: (key: string) => string) => z.object({
   email: z.string().email(t("auth.emailInvalid")),
@@ -27,7 +29,7 @@ type LoginForm = {
 
 type LoginScreenProps = {
   navigation: {
-    navigate: (screen: "Register") => void;
+    navigate: (screen: "Register" | "VerifyEmail", params?: { email: string }) => void;
   };
 };
 
@@ -65,6 +67,12 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
       await loginAction(response);
       showToast(t("auth.welcome"), "success");
     } catch (error) {
+      const axiosError = error as AxiosError<{ detail?: string }>;
+      if (axiosError.response?.data?.detail === "EMAIL_NOT_VERIFIED") {
+        showToast(t("auth.checkYourEmail"), "warning");
+        navigation.navigate("VerifyEmail", { email: values.email });
+        return;
+      }
       showToast(getApiErrorMessage(error, t, "auth.invalidCredentials"), "error");
     }
   });
@@ -166,7 +174,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = makeStyles((colors) => ({
   screen: {
     flex: 1,
     backgroundColor: colors.bg,
@@ -301,4 +309,4 @@ const styles = StyleSheet.create({
     fontFamily: typography.fontFamily.body,
     textDecorationLine: "underline",
   },
-});
+}));

@@ -21,6 +21,7 @@ import { useUIStore } from "../../store/uiStore";
 import { getApiErrorMessage } from "../../utils/apiError";
 import DatePickerField from "../../components/ui/DatePickerField";
 import { BillingCycle } from "../../types/api";
+import { makeStyles } from "../../theme/styles";
 
 const SUB_EMOJIS = [
   "💳", "📺", "🎵", "🎮", "☁️", "📱", "🎬",
@@ -177,7 +178,7 @@ export default function AddSubscriptionScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = makeStyles((colors) => ({
   root: {
     flex: 1,
     backgroundColor: colors.bg,
@@ -307,4 +308,4 @@ const styles = StyleSheet.create({
   saveBtnTextDisabled: {
     color: colors.textMuted,
   },
-});
+}));

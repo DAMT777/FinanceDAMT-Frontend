@@ -13,6 +13,11 @@ export interface RegisterRequest {
   password: string;
 }
 
+export interface RegisterResult {
+  email: string;
+  requiresEmailVerification: boolean;
+}
+
 export interface LoginRequest {
   email: string;
   password: string;

@@ -5,6 +5,7 @@ import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-na
 import { colors } from "../../constants/colors";
 import { spacing } from "../../constants/spacing";
 import { typography } from "../../constants/typography";
+import { makeStyles } from "../../theme/styles";
 
 type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
 type ButtonSize = "sm" | "md" | "lg";
@@ -87,7 +88,7 @@ export default function Button({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = makeStyles((colors) => ({
   base: {
     borderRadius: 16,
     alignItems: "center",
@@ -127,4 +128,4 @@ const styles = StyleSheet.create({
   label_danger: {
     color: colors.textPrimary,
   },
-});
+}));

@@ -28,6 +28,7 @@ import { useUIStore } from "../../store/uiStore";
 import { getApiErrorMessage } from "../../utils/apiError";
 import { getCategoryDisplay } from "../../utils/categoryIcons";
 import { CategoryDto, TransactionType } from "../../types/api";
+import { makeStyles } from "../../theme/styles";
 
 const formSchema = z.object({
   amount: z.number().positive(),
@@ -285,7 +286,7 @@ export default function AddTransactionScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = makeStyles((colors) => ({
   container: {
     flex: 1,
     backgroundColor: colors.bg,
@@ -453,4 +454,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: typography.fontFamily.headingSemiBold,
   },
-});
+}));

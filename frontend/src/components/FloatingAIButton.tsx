@@ -8,6 +8,7 @@ import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-na
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "../constants/colors";
 import { AppStackParams } from "../navigation/types";
+import { makeStyles } from "../theme/styles";
 
 export default function FloatingAIButton() {
   const { t } = useTranslation();
@@ -45,7 +46,7 @@ export default function FloatingAIButton() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = makeStyles((colors) => ({
   wrap: {
     position: "absolute",
     right: 20,
@@ -67,4 +68,4 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 6 },
     elevation: 12,
   },
-});
+}));

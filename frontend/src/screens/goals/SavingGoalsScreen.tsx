@@ -21,6 +21,7 @@ import { spacing } from "../../constants/spacing";
 import { typography } from "../../constants/typography";
 import { useGoals } from "../../hooks/useGoals";
 import { AppStackParams } from "../../navigation/types";
+import { makeStyles } from "../../theme/styles";
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat("es-CO", {
@@ -180,7 +181,7 @@ export default function SavingGoalsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = makeStyles((colors) => ({
   scroll: { flex: 1 },
   content: {
     padding: spacing.lg,
@@ -335,4 +336,4 @@ const styles = StyleSheet.create({
     fontFamily: typography.fontFamily.headingSemiBold,
     fontSize: 15,
   },
-});
+}));

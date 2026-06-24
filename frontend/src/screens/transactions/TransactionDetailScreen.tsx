@@ -19,6 +19,7 @@ import { useDeleteTransaction } from "../../hooks/useTransactions";
 import { useUIStore } from "../../store/uiStore";
 import { getApiErrorMessage } from "../../utils/apiError";
 import { AppStackParams } from "../../navigation/types";
+import { makeStyles } from "../../theme/styles";
 
 type DetailRoute = RouteProp<AppStackParams, "TransactionDetail">;
 
@@ -162,7 +163,7 @@ function Divider() {
   return <View style={styles.divider} />;
 }
 
-const styles = StyleSheet.create({
+const styles = makeStyles((colors) => ({
   root: {
     flex: 1,
     backgroundColor: colors.bg,
@@ -224,7 +225,7 @@ const styles = StyleSheet.create({
     fontWeight: "800",
   },
   heroDate: {
-    color: colors.textSecondary,
+    color: "rgba(255,255,255,0.6)",
     fontFamily: typography.fontFamily.body,
     fontSize: 13,
     textAlign: "center",
@@ -293,4 +294,4 @@ const styles = StyleSheet.create({
     fontFamily: typography.fontFamily.headingSemiBold,
     fontSize: 15,
   },
-});
+}));

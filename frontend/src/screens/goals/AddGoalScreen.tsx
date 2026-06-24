@@ -20,6 +20,7 @@ import { useCreateGoal } from "../../hooks/useGoals";
 import { useUIStore } from "../../store/uiStore";
 import { getApiErrorMessage } from "../../utils/apiError";
 import DatePickerField from "../../components/ui/DatePickerField";
+import { makeStyles } from "../../theme/styles";
 
 const GOAL_EMOJIS = [
   "🏠", "🚗", "✈️", "📱", "💻", "🎓", "💍",
@@ -152,7 +153,7 @@ export default function AddGoalScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = makeStyles((colors) => ({
   root: {
     flex: 1,
     backgroundColor: colors.bg,
@@ -257,4 +258,4 @@ const styles = StyleSheet.create({
   saveBtnTextDisabled: {
     color: colors.textMuted,
   },
-});
+}));

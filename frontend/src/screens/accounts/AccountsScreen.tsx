@@ -10,6 +10,7 @@ import { spacing } from "../../constants/spacing";
 import { typography } from "../../constants/typography";
 import { useAccounts, useNetWorth } from "../../hooks/useAccounts";
 import { AppStackParams } from "../../navigation/types";
+import { makeStyles } from "../../theme/styles";
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat("es-CO", {
@@ -64,7 +65,7 @@ export default function AccountsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = makeStyles((colors) => ({
   container: {
     flex: 1,
     backgroundColor: colors.bg,
@@ -142,4 +143,4 @@ const styles = StyleSheet.create({
     fontFamily: typography.fontFamily.mono,
     fontSize: typography.fontSize.md,
   },
-});
+}));

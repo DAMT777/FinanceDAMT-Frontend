@@ -5,6 +5,7 @@ import { colors } from "../constants/colors";
 import { spacing } from "../constants/spacing";
 import { typography } from "../constants/typography";
 import { useUIStore } from "../store/uiStore";
+import { makeStyles } from "../theme/styles";
 
 type Props = {
   visible: boolean;
@@ -77,7 +78,7 @@ export default function LanguageSelector({ visible, onClose }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = makeStyles((colors) => ({
   overlay: {
     flex: 1,
     justifyContent: "flex-end",
@@ -164,4 +165,4 @@ const styles = StyleSheet.create({
     fontFamily: typography.fontFamily.headingSemiBold,
     fontSize: 15,
   },
-});
+}));

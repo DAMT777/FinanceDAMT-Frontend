@@ -8,6 +8,7 @@ import Input from "../../components/ui/Input";
 import { colors } from "../../constants/colors";
 import { spacing } from "../../constants/spacing";
 import { typography } from "../../constants/typography";
+import { makeStyles } from "../../theme/styles";
 
 const employmentOptions = ["survey.employed", "survey.freelance", "survey.businessOwner", "survey.student"] as const;
 const goalOptions = [
@@ -179,7 +180,7 @@ export default function SurveyScreen({ navigation }: SurveyScreenProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = makeStyles((colors) => ({
   container: {
     flex: 1,
     backgroundColor: colors.bg,
@@ -302,4 +303,4 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     paddingBottom: spacing.xl,
   },
-});
+}));

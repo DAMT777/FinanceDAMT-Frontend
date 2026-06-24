@@ -1,10 +1,19 @@
 import apiClient from "./client";
-import { LoginRequest, LoginResponse, RegisterRequest } from "../types/api";
+import { LoginRequest, LoginResponse, RegisterRequest, RegisterResult } from "../types/api";
 
 export const authApi = {
-  async register(data: RegisterRequest): Promise<LoginResponse> {
-    const response = await apiClient.post<LoginResponse>("/auth/register", data);
+  async register(data: RegisterRequest): Promise<RegisterResult> {
+    const response = await apiClient.post<RegisterResult>("/auth/register", data);
     return response.data;
+  },
+
+  async verifyEmail(email: string, code: string): Promise<LoginResponse> {
+    const response = await apiClient.post<LoginResponse>("/auth/verify-email", { email, code });
+    return response.data;
+  },
+
+  async resendVerification(email: string): Promise<void> {
+    await apiClient.post("/auth/resend-verification", { email });
   },
 
   async login(email: string, password: string): Promise<LoginResponse> {

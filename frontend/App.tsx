@@ -9,6 +9,8 @@ import Toast from "react-native-toast-message";
 import RootNavigator from "./src/navigation/RootNavigator";
 import { queryClient } from "./src/lib/queryClient";
 import { useUIStore } from "./src/store/uiStore";
+import { useThemeStore } from "./src/store/themeStore";
+import { applyTheme } from "./src/theme";
 
 function ToastBridge() {
   const toast = useUIStore((state) => state.toast);
@@ -33,13 +35,24 @@ function ToastBridge() {
 }
 
 export default function App() {
+  const theme = useThemeStore((state) => state.theme);
+  const loadTheme = useThemeStore((state) => state.loadTheme);
+
+  // Keep the live palette and style resolver in sync before children render, so
+  // a theme change re-renders the whole tree with the new colors.
+  applyTheme(theme);
+
+  useEffect(() => {
+    void loadTheme();
+  }, [loadTheme]);
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider initialMetrics={initialWindowMetrics}>
         <QueryClientProvider client={queryClient}>
           <RootNavigator />
           <ToastBridge />
-          <StatusBar style="light" />
+          <StatusBar style={theme === "dark" ? "light" : "dark"} />
         </QueryClientProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>

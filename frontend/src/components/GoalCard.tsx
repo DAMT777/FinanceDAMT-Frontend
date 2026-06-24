@@ -11,6 +11,7 @@ import { SavingGoalDto } from "../types/api";
 import { colors } from "../constants/colors";
 import { spacing } from "../constants/spacing";
 import { typography } from "../constants/typography";
+import { makeStyles } from "../theme/styles";
 
 interface GoalCardProps {
   goal: SavingGoalDto;
@@ -70,7 +71,7 @@ export default function GoalCard({ goal, onContribute }: GoalCardProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = makeStyles((colors) => ({
   card: {
     width: 160,
     borderRadius: 20,
@@ -126,4 +127,4 @@ const styles = StyleSheet.create({
     fontFamily: typography.fontFamily.headingSemiBold,
     fontSize: 13,
   },
-});
+}));

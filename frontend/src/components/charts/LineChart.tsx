@@ -1,6 +1,7 @@
 import { LineChart as GiftedLineChart } from "react-native-gifted-charts";
 import { StyleSheet, View } from "react-native";
 import { colors } from "../../constants/colors";
+import { makeStyles } from "../../theme/styles";
 
 interface LineChartPoint {
   value: number;
@@ -28,10 +29,10 @@ export default function LineChart({ data }: LineChartProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = makeStyles((colors) => ({
   container: {
     backgroundColor: colors.bgCard,
     borderRadius: 20,
     padding: 12,
   },
-});
+}));

@@ -11,6 +11,7 @@ import {
   useNotifications,
 } from "../../hooks/useNotifications";
 import { NotificationType } from "../../types/api";
+import { makeStyles } from "../../theme/styles";
 
 const TYPE_STYLE: Record<NotificationType, { icon: keyof typeof Ionicons.glyphMap; color: string; bg: string }> = {
   BudgetAlert: { icon: "warning-outline", color: colors.warning, bg: "rgba(255,184,48,0.15)" },
@@ -121,7 +122,7 @@ export default function NotificationsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = makeStyles((colors) => ({
   root: {
     flex: 1,
     backgroundColor: colors.bg,
@@ -267,4 +268,4 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSize.sm,
     textAlign: "center",
   },
-});
+}));

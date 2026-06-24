@@ -6,6 +6,7 @@ export type AuthStackParams = {
   Onboarding: undefined;
   Login: undefined;
   Register: undefined;
+  VerifyEmail: { email: string };
   Survey: undefined;
 };
 

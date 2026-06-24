@@ -5,8 +5,8 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { PieChart } from "react-native-gifted-charts";
 import { RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { PieChart } from "react-native-gifted-charts";
 import AnimatedNumber from "../../components/AnimatedNumber";
 import BudgetBar from "../../components/BudgetBar";
 import IncomeExpenseChart from "../../components/charts/IncomeExpenseChart";
@@ -19,6 +19,7 @@ import { typography } from "../../constants/typography";
 import { useDashboard } from "../../hooks/useDashboard";
 import { useUnreadCount } from "../../hooks/useNotifications";
 import { useTransactions } from "../../hooks/useTransactions";
+import { useSubscriptions } from "../../hooks/useSubscriptions";
 import { AppStackParams } from "../../navigation/types";
 import { getCategoryDisplay } from "../../utils/categoryIcons";
 import {
@@ -29,6 +30,7 @@ import {
   rangeStart,
 } from "../../utils/trendBuckets";
 import { useAuthStore } from "../../store/authStore";
+import { makeStyles } from "../../theme/styles";
 
 const QUICK_ACTIONS = [
   {
@@ -134,7 +136,6 @@ export default function DashboardScreen() {
     );
   }
 
-  const categories = data?.expenseByCategory ?? [];
   const recentTransactions = transactions.data?.items ?? [];
 
   const initials = (user?.name ?? "Juan Luis")
@@ -144,19 +145,7 @@ export default function DashboardScreen() {
     .join("")
     .toUpperCase();
 
-  const monthTotal = categories.reduce((sum, item) => sum + item.amount, 0);
-
-  const currentMonthShort = new Date()
-    .toLocaleString(locale, { month: "short" })
-    .replace(".", "")
-    .toUpperCase();
-
   const savingsPositive = trend.net >= 0;
-
-  const pieData = categories.map((item) => ({
-    value: Math.max(1, item.amount),
-    color: item.categoryColor || colors.accent,
-  }));
 
   try {
     return (
@@ -373,45 +362,6 @@ export default function DashboardScreen() {
 
       <View style={styles.sectionWrap}>
         <View style={styles.sectionHead}>
-          <Text style={styles.sectionTitle}>{t("dashboard.spendingOverview")}</Text>
-          <View style={styles.monthPill}>
-            <Text style={styles.monthText}>{currentMonthShort}</Text>
-          </View>
-        </View>
-
-        <View style={styles.chartCard}>
-          <View style={styles.chartRow}>
-            <View style={styles.chartLeft}>
-              <PieChart
-                data={pieData.length ? pieData : [{ value: 1, color: colors.bgCardBorder }]}
-                donut
-                radius={60}
-                innerRadius={40}
-                innerCircleColor={colors.bgCard}
-                centerLabelComponent={() => (
-                  <View style={{ alignItems: "center" }}>
-                    <Text style={styles.chartCenterAmount}>{formatShortMoney(monthTotal)}</Text>
-                    <Text style={styles.chartCenterMonth}>{currentMonthShort}</Text>
-                  </View>
-                )}
-              />
-            </View>
-
-            <View style={styles.legendWrap}>
-              {categories.slice(0, 4).map((item) => (
-                <View key={item.categoryId} style={styles.legendRow}>
-                  <View style={[styles.legendDot, { backgroundColor: item.categoryColor || colors.accent }]} />
-                  <Text style={styles.legendName}>{item.categoryName}</Text>
-                  <Text style={styles.legendPct}>{`${Math.round(item.percentage)}%`}</Text>
-                </View>
-              ))}
-            </View>
-          </View>
-        </View>
-      </View>
-
-      <View style={styles.sectionWrap}>
-        <View style={styles.sectionHead}>
           <Text style={styles.sectionTitle}>{t("dashboard.budgetStatus")}</Text>
           {!!budgets.length ? (
             <TouchableOpacity onPress={() => navigation.navigate("AddBudget")}>
@@ -516,7 +466,7 @@ export default function DashboardScreen() {
   }
 }
 
-const styles = StyleSheet.create({
+const styles = makeStyles((colors) => ({
   loadingWrap: {
     flex: 1,
     backgroundColor: colors.bg,
@@ -952,4 +902,4 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontFamily: typography.fontFamily.mono,
   },
-});
+}));

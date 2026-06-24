@@ -2,6 +2,7 @@ import { Pressable, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
 import { colors } from "../../constants/colors";
 import { spacing } from "../../constants/spacing";
+import { makeStyles } from "../../theme/styles";
 
 interface CardProps {
   children: React.ReactNode;
@@ -53,7 +54,7 @@ export default function Card({ children, style, onPress, glowColor }: CardProps)
   );
 }
 
-const styles = StyleSheet.create({
+const styles = makeStyles((colors) => ({
   card: {
     borderRadius: 20,
     borderWidth: 1,
@@ -61,4 +62,4 @@ const styles = StyleSheet.create({
     backgroundColor: colors.bgCard,
     padding: spacing.lg,
   },
-});
+}));

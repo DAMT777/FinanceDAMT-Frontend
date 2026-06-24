@@ -5,6 +5,7 @@ import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 import { colors } from "../../constants/colors";
 import { typography } from "../../constants/typography";
 import { moderateScale, scale } from "../../utils/responsive";
+import { makeStyles } from "../../theme/styles";
 
 interface DatePickerFieldProps {
   value: string;
@@ -163,7 +164,7 @@ export default function DatePickerField({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = makeStyles((colors) => ({
   field: {
     backgroundColor: colors.bgCard,
     borderWidth: 1,
@@ -266,4 +267,4 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     opacity: 0.4,
   },
-});
+}));

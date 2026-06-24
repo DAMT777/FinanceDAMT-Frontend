@@ -4,6 +4,7 @@ import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { colors } from "../../constants/colors";
 import { typography } from "../../constants/typography";
 import { useAuthStore } from "../../store/authStore";
+import { makeStyles } from "../../theme/styles";
 
 type SplashScreenProps = {
   navigation?: {
@@ -49,7 +50,7 @@ export default function SplashScreen({ navigation, autoNavigate = true }: Splash
   );
 }
 
-const styles = StyleSheet.create({
+const styles = makeStyles((colors) => ({
   container: {
     flex: 1,
     backgroundColor: colors.bg,
@@ -102,4 +103,4 @@ const styles = StyleSheet.create({
   spinner: {
     marginTop: 24,
   },
-});
+}));

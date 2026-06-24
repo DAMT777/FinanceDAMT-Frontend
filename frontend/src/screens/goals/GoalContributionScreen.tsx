@@ -21,6 +21,7 @@ import { useGoals, useAddContribution } from "../../hooks/useGoals";
 import { AppStackParams } from "../../navigation/types";
 import { useUIStore } from "../../store/uiStore";
 import { getApiErrorMessage } from "../../utils/apiError";
+import { makeStyles } from "../../theme/styles";
 
 type ContributionRoute = RouteProp<AppStackParams, "GoalContribution">;
 
@@ -177,7 +178,7 @@ export default function GoalContributionScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = makeStyles((colors) => ({
   root: {
     flex: 1,
     backgroundColor: colors.bg,
@@ -309,4 +310,4 @@ const styles = StyleSheet.create({
   saveBtnTextDisabled: {
     color: colors.textMuted,
   },
-});
+}));

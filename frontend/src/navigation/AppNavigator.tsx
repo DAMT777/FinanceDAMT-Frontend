@@ -19,6 +19,7 @@ import TransactionListScreen from "../screens/transactions/TransactionListScreen
 import AddTransactionScreen from "../screens/transactions/AddTransactionScreen";
 import SavingGoalsScreen from "../screens/goals/SavingGoalsScreen";
 import ProfileScreen from "../screens/profile/ProfileScreen";
+import { makeStyles } from "../theme/styles";
 
 const Tab = createBottomTabNavigator<AppTabParams>();
 
@@ -164,7 +165,7 @@ export default function AppNavigator() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = makeStyles((colors) => ({
   tabBarWrap: {
     position: "absolute",
     left: 20,
@@ -225,4 +226,4 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 6 },
     elevation: 10,
   },
-});
+}));

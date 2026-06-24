@@ -20,6 +20,7 @@ import { useCreateAccount } from "../../hooks/useAccounts";
 import { useUIStore } from "../../store/uiStore";
 import { getApiErrorMessage } from "../../utils/apiError";
 import { AccountType } from "../../types/api";
+import { makeStyles } from "../../theme/styles";
 
 const ACCOUNT_TYPES: { type: AccountType; icon: keyof typeof Ionicons.glyphMap; labelKey: string; color: string }[] = [
   { type: "Cash", icon: "cash-outline", labelKey: "accounts.cash", color: colors.primary },
@@ -158,7 +159,7 @@ export default function AddAccountScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = makeStyles((colors) => ({
   root: {
     flex: 1,
     backgroundColor: colors.bg,
@@ -262,4 +263,4 @@ const styles = StyleSheet.create({
   saveBtnTextDisabled: {
     color: colors.textMuted,
   },
-});
+}));

@@ -9,6 +9,7 @@ import { getCategoryDisplay } from "../utils/categoryIcons";
 import { colors } from "../constants/colors";
 import { spacing } from "../constants/spacing";
 import { typography } from "../constants/typography";
+import { makeStyles } from "../theme/styles";
 
 interface TransactionItemProps {
   transaction: TransactionDto;
@@ -77,7 +78,7 @@ export default function TransactionItem({ transaction, onPress }: TransactionIte
   );
 }
 
-const styles = StyleSheet.create({
+const styles = makeStyles((colors) => ({
   container: {
     flexDirection: "row",
     alignItems: "center",
@@ -126,4 +127,4 @@ const styles = StyleSheet.create({
     fontFamily: typography.fontFamily.body,
     fontSize: 11,
   },
-});
+}));

@@ -5,6 +5,7 @@ import { colors } from "../../constants/colors";
 import { spacing } from "../../constants/spacing";
 import { typography } from "../../constants/typography";
 import { useFinancialScore, useRecommendations } from "../../hooks/useAI";
+import { makeStyles } from "../../theme/styles";
 
 function getScoreColor(score: number): string {
   if (score < 40) return colors.expense;
@@ -45,7 +46,7 @@ export default function RecommendationsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = makeStyles((colors) => ({
   container: {
     flex: 1,
     backgroundColor: colors.bg,
@@ -98,4 +99,4 @@ const styles = StyleSheet.create({
     fontFamily: typography.fontFamily.body,
     fontSize: typography.fontSize.sm,
   },
-});
+}));

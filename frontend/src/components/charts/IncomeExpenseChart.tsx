@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { colors } from "../../constants/colors";
 import { typography } from "../../constants/typography";
 import { TrendBucket } from "../../utils/trendBuckets";
+import { makeStyles } from "../../theme/styles";
 
 interface IncomeExpenseChartProps {
   points: TrendBucket[];
@@ -104,7 +105,7 @@ export default function IncomeExpenseChart({ points, formatShort }: IncomeExpens
   );
 }
 
-const styles = StyleSheet.create({
+const styles = makeStyles((colors) => ({
   legend: {
     flexDirection: "row",
     gap: 16,
@@ -136,4 +137,4 @@ const styles = StyleSheet.create({
     fontSize: 9,
     fontFamily: typography.fontFamily.body,
   },
-});
+}));

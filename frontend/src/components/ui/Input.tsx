@@ -12,6 +12,7 @@ import {
 import { colors } from "../../constants/colors";
 import { spacing } from "../../constants/spacing";
 import { typography } from "../../constants/typography";
+import { makeStyles } from "../../theme/styles";
 
 interface InputProps extends TextInputProps {
   label: string;
@@ -107,7 +108,7 @@ export default function Input({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = makeStyles((colors) => ({
   wrapper: {
     gap: spacing.xs,
   },
@@ -149,4 +150,4 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSize.xs,
     fontFamily: typography.fontFamily.body,
   },
-});
+}));

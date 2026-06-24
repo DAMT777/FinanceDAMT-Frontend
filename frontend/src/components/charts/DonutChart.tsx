@@ -2,6 +2,7 @@ import { PieChart } from "react-native-gifted-charts";
 import { StyleSheet, Text, View } from "react-native";
 import { colors } from "../../constants/colors";
 import { typography } from "../../constants/typography";
+import { makeStyles } from "../../theme/styles";
 
 interface DonutChartItem {
   value: number;
@@ -30,7 +31,7 @@ export default function DonutChart({ data, total }: DonutChartProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = makeStyles((colors) => ({
   container: {
     alignItems: "center",
     justifyContent: "center",
@@ -43,4 +44,4 @@ const styles = StyleSheet.create({
     fontFamily: typography.fontFamily.mono,
     fontSize: 20,
   },
-});
+}));

@@ -20,8 +20,8 @@ import Input from "../../components/ui/Input";
 import { colors } from "../../constants/colors";
 import { spacing } from "../../constants/spacing";
 import { typography } from "../../constants/typography";
-import { useAuthStore } from "../../store/authStore";
 import { useUIStore } from "../../store/uiStore";
+import { makeStyles } from "../../theme/styles";
 
 const buildRegisterSchema = (t: (key: string) => string) => z
   .object({
@@ -47,7 +47,7 @@ type RegisterForm = {
 
 type RegisterScreenProps = {
   navigation: {
-    navigate: (screen: "Login" | "Survey") => void;
+    navigate: (screen: "Login" | "VerifyEmail", params?: { email: string }) => void;
   };
 };
 
@@ -65,7 +65,6 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
   const { t } = useTranslation();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useState(false);
-  const loginAction = useAuthStore((state) => state.login);
   const showToast = useUIStore((state) => state.showToast);
 
   const contentOpacity = useSharedValue(0);
@@ -109,13 +108,12 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
 
   const onSubmit = handleSubmit(async (values) => {
     try {
-      const response = await authApi.register({
+      await authApi.register({
         name: values.name,
         email: values.email,
         password: values.password,
       });
-      await loginAction(response);
-      navigation.navigate("Survey");
+      navigation.navigate("VerifyEmail", { email: values.email });
     } catch (error) {
       const axiosError = error as AxiosError<{ detail?: string }>;
       const status = axiosError.response?.status;
@@ -290,7 +288,7 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = makeStyles((colors) => ({
   screen: {
     flex: 1,
     backgroundColor: colors.bg,
@@ -419,4 +417,4 @@ const styles = StyleSheet.create({
     fontFamily: typography.fontFamily.bodyMedium,
     textDecorationLine: "underline",
   },
-});
+}));

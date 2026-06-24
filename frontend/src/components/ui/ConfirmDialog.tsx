@@ -9,6 +9,7 @@ import { useEffect } from "react";
 import { colors } from "../../constants/colors";
 import { spacing } from "../../constants/spacing";
 import { typography } from "../../constants/typography";
+import { makeStyles } from "../../theme/styles";
 
 interface ConfirmDialogProps {
   visible: boolean;
@@ -82,7 +83,7 @@ export default function ConfirmDialog({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = makeStyles((colors) => ({
   overlay: {
     ...StyleSheet.absoluteFillObject,
     zIndex: 999,
@@ -155,4 +156,4 @@ const styles = StyleSheet.create({
   confirmTextDestructive: {
     color: colors.expense,
   },
-});
+}));

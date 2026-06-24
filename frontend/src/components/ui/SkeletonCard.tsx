@@ -8,6 +8,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { colors } from "../../constants/colors";
+import { makeStyles } from "../../theme/styles";
 
 interface SkeletonCardProps {
   width?: number;
@@ -54,11 +55,11 @@ export default function SkeletonCard({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = makeStyles((colors) => ({
   base: {
     overflow: "hidden",
   },
   fullWidth: {
     width: "100%",
   },
-});
+}));

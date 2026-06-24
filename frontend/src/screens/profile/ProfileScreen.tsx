@@ -12,7 +12,9 @@ import ConfirmDialog from "../../components/ui/ConfirmDialog";
 import { colors } from "../../constants/colors";
 import { typography } from "../../constants/typography";
 import { useAuthStore } from "../../store/authStore";
+import { useThemeStore } from "../../store/themeStore";
 import { useUIStore } from "../../store/uiStore";
+import { makeStyles } from "../../theme/styles";
 
 export default function ProfileScreen() {
   const { t } = useTranslation();
@@ -21,6 +23,8 @@ export default function ProfileScreen() {
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
   const currentLanguage = useUIStore((state) => state.currentLanguage);
+  const theme = useThemeStore((state) => state.theme);
+  const toggleTheme = useThemeStore((state) => state.toggleTheme);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [showLanguageSelector, setShowLanguageSelector] = useState(false);
   const [biometricEnabled, setBiometricEnabled] = useState(true);
@@ -88,6 +92,21 @@ export default function ProfileScreen() {
               label={t("profile.notifications")}
               value={t("common.yes")}
             />
+            <Divider />
+            <View style={styles.row}>
+              <View style={styles.rowLeft}>
+                <View style={[styles.iconCircle, { backgroundColor: "rgba(108,99,255,0.1)" }]}>
+                  <Ionicons name="moon-outline" size={16} color={colors.accent} />
+                </View>
+                <Text style={styles.rowLabel}>{t("profile.darkMode")}</Text>
+              </View>
+              <Switch
+                value={theme === "dark"}
+                onValueChange={toggleTheme}
+                trackColor={{ false: colors.bgCardBorder, true: colors.primary }}
+                thumbColor="#FFFFFF"
+              />
+            </View>
           </View>
 
           <Text style={styles.sectionLabel}>{t("profile.title").toUpperCase()}</Text>
@@ -178,7 +197,7 @@ function Divider() {
   return <View style={styles.divider} />;
 }
 
-const styles = StyleSheet.create({
+const styles = makeStyles((colors) => ({
   container: {
     flex: 1,
     backgroundColor: colors.bg,
@@ -316,4 +335,4 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontFamily: typography.fontFamily.bodyMedium,
   },
-});
+}));

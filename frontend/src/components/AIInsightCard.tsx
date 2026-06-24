@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { colors } from "../constants/colors";
 import { spacing } from "../constants/spacing";
 import { typography } from "../constants/typography";
+import { makeStyles } from "../theme/styles";
 
 interface AIInsightCardProps {
   insight: string;
@@ -36,7 +37,7 @@ export default function AIInsightCard({ insight, onAskAI }: AIInsightCardProps) 
   );
 }
 
-const styles = StyleSheet.create({
+const styles = makeStyles((colors) => ({
   card: {
     borderRadius: 20,
     borderWidth: 1,
@@ -87,4 +88,4 @@ const styles = StyleSheet.create({
     fontFamily: typography.fontFamily.headingSemiBold,
     fontSize: 12,
   },
-});
+}));

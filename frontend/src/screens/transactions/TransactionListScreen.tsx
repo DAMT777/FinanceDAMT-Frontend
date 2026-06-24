@@ -28,6 +28,7 @@ import { typography } from "../../constants/typography";
 import { useDeleteTransaction, useTransactions } from "../../hooks/useTransactions";
 import { TransactionDto } from "../../types/api";
 import { AppStackParams } from "../../navigation/types";
+import { makeStyles } from "../../theme/styles";
 
 type SectionData = {
   title: string;
@@ -211,7 +212,7 @@ export default function TransactionListScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = makeStyles((colors) => ({
   container: {
     flex: 1,
     backgroundColor: colors.bg,
@@ -314,4 +315,4 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
   },
-});
+}));

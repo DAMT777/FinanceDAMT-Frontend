@@ -23,6 +23,7 @@ import { useUIStore } from "../../store/uiStore";
 import { getApiErrorMessage } from "../../utils/apiError";
 import { getCategoryDisplay } from "../../utils/categoryIcons";
 import { CategoryDto } from "../../types/api";
+import { makeStyles } from "../../theme/styles";
 
 function categoryEmoji(cat: CategoryDto): string {
   const icon = cat.icon ?? "";
@@ -68,9 +69,12 @@ export default function AddBudgetScreen() {
   const handleSave = async () => {
     if (!isValid || !selectedCategory) return;
     try {
+      const now = new Date();
       await setBudget.mutateAsync({
         categoryId: selectedCategory.id,
         monthlyLimit: limitValue,
+        month: now.getMonth() + 1,
+        year: now.getFullYear(),
       });
       showToast(t("budgets.budgetSet"), "success");
       navigation.goBack();
@@ -172,7 +176,7 @@ export default function AddBudgetScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = makeStyles((colors) => ({
   root: {
     flex: 1,
     backgroundColor: colors.bg,
@@ -297,4 +301,4 @@ const styles = StyleSheet.create({
   saveBtnTextDisabled: {
     color: colors.textMuted,
   },
-});
+}));

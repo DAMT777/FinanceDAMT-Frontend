@@ -7,6 +7,7 @@ import { colors } from "../../constants/colors";
 import { typography } from "../../constants/typography";
 import Button from "../../components/ui/Button";
 import { spacing } from "../../constants/spacing";
+import { makeStyles } from "../../theme/styles";
 
 type Slide = {
   id: string;
@@ -135,7 +136,7 @@ export default function OnboardingScreen({ navigation }: OnboardingProps) {
               ) : null}
             </View>
 
-            <View style={[styles.bottomArea, { paddingBottom: insets.bottom + 24 }]}>
+            <View style={[styles.bottomArea, { paddingBottom: Math.max(insets.bottom, 16) + 32 }]}>
               <Text style={styles.title}>{item.title}</Text>
               <Text style={styles.subtitle}>{item.subtitle}</Text>
 
@@ -167,7 +168,7 @@ export default function OnboardingScreen({ navigation }: OnboardingProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = makeStyles((colors) => ({
   container: {
     flex: 1,
     backgroundColor: colors.bg,
@@ -296,7 +297,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   userBubbleText: {
-    color: colors.textPrimary,
+    color: "#F0F0FF",
     fontFamily: typography.fontFamily.body,
     fontSize: 13,
   },
@@ -376,4 +377,4 @@ const styles = StyleSheet.create({
     fontFamily: typography.fontFamily.headingSemiBold,
     fontSize: 14,
   },
-});
+}));

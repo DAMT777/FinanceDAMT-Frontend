@@ -19,6 +19,7 @@ import { typography } from "../../constants/typography";
 import { moderateScale, scale } from "../../utils/responsive";
 import { useChatMessage } from "../../hooks/useAI";
 import { ChatMessageDto } from "../../types/api";
+import { makeStyles } from "../../theme/styles";
 
 type ChatUiMessage = ChatMessageDto & { id: string };
 
@@ -134,7 +135,7 @@ export default function ChatScreen() {
             return (
               <View style={styles.userRow}>
                 <View style={styles.userBubble}>
-                  <Text style={styles.messageText}>{item.content}</Text>
+                  <Text style={styles.userMessageText}>{item.content}</Text>
                 </View>
               </View>
             );
@@ -228,7 +229,7 @@ function TouchableChip({ text, onPress }: { text: string; onPress: () => void })
   );
 }
 
-const styles = StyleSheet.create({
+const styles = makeStyles((colors) => ({
   container: {
     flex: 1,
     backgroundColor: colors.bg,
@@ -316,6 +317,12 @@ const styles = StyleSheet.create({
   },
   messageText: {
     color: colors.textPrimary,
+    fontSize: moderateScale(14),
+    lineHeight: moderateScale(22),
+    fontFamily: typography.fontFamily.body,
+  },
+  userMessageText: {
+    color: "#F0F0FF",
     fontSize: moderateScale(14),
     lineHeight: moderateScale(22),
     fontFamily: typography.fontFamily.body,
@@ -409,4 +416,4 @@ const styles = StyleSheet.create({
   sendBtnEmpty: {
     backgroundColor: colors.bgCardAlt,
   },
-});
+}));

@@ -5,6 +5,7 @@ import { BudgetDto } from "../types/api";
 import { colors } from "../constants/colors";
 import { spacing } from "../constants/spacing";
 import { typography } from "../constants/typography";
+import { makeStyles } from "../theme/styles";
 
 interface BudgetBarProps {
   budget: BudgetDto;
@@ -68,7 +69,7 @@ export default function BudgetBar({ budget }: BudgetBarProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = makeStyles((colors) => ({
   container: {
     borderRadius: 16,
     borderWidth: 1,
@@ -142,4 +143,4 @@ const styles = StyleSheet.create({
     fontFamily: typography.fontFamily.body,
     fontSize: 11,
   },
-});
+}));

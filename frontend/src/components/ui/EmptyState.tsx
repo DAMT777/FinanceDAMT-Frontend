@@ -3,6 +3,7 @@ import Button from "./Button";
 import { colors } from "../../constants/colors";
 import { spacing } from "../../constants/spacing";
 import { typography } from "../../constants/typography";
+import { makeStyles } from "../../theme/styles";
 
 interface EmptyStateProps {
   icon: string;
@@ -33,7 +34,7 @@ export default function EmptyState({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = makeStyles((colors) => ({
   container: {
     alignItems: "center",
     justifyContent: "center",
@@ -60,4 +61,4 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
     minWidth: 180,
   },
-});
+}));

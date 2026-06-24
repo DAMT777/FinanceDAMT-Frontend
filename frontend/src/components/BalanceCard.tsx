@@ -6,6 +6,7 @@ import AnimatedNumber from "./AnimatedNumber";
 import { colors } from "../constants/colors";
 import { spacing } from "../constants/spacing";
 import { typography } from "../constants/typography";
+import { makeStyles } from "../theme/styles";
 
 interface BalanceCardProps {
   totalBalance: number;
@@ -92,7 +93,7 @@ export default function BalanceCard({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = makeStyles((colors) => ({
   shadow: {
     borderRadius: 24,
     shadowColor: colors.primary,
@@ -175,4 +176,4 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,255,255,0.1)",
     marginHorizontal: spacing.md,
   },
-});
+}));
