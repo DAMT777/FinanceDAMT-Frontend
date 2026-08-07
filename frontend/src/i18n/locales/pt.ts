@@ -308,6 +308,7 @@ export const pt = {
       applied: "✓ Aplicado",
       couldNotReach: "Não foi possível conectar ao serviço de IA agora.",
       updatedNow: "Atualizado agora",
+      typing: "digitando…",
       clear: "Limpar",
     },
     profile: {

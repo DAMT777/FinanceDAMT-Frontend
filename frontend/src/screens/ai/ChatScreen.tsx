@@ -1,7 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
+  Animated,
   FlatList,
   KeyboardAvoidingView,
   Platform,
@@ -63,6 +64,9 @@ export default function ChatScreen() {
   const insets = useSafeAreaInsets();
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<ChatUiMessage[]>([]);
+  // Id of the assistant message currently revealing with the typewriter effect.
+  const [animatingId, setAnimatingId] = useState<string | null>(null);
+  const listRef = useRef<FlatList<ChatUiMessage>>(null);
   const chatMutation = useChatMessage();
 
   const suggestions = [t("ai.suggestion1"), t("ai.suggestion2"), t("ai.suggestion3")];
@@ -82,13 +86,12 @@ export default function ChatScreen() {
         history: historySnapshot,
       });
 
-      setMessages((prev) => [
-        ...prev,
-        {
-          ...createMessage("assistant", response.response),
-          timestamp: response.history[response.history.length - 1]?.timestamp ?? new Date().toISOString(),
-        },
-      ]);
+      const assistantMessage: ChatUiMessage = {
+        ...createMessage("assistant", response.response),
+        timestamp: response.history[response.history.length - 1]?.timestamp ?? new Date().toISOString(),
+      };
+      setAnimatingId(assistantMessage.id);
+      setMessages((prev) => [...prev, assistantMessage]);
     } catch {
       setMessages((prev) => [...prev, createMessage("assistant", t("ai.couldNotReach"))]);
     }
@@ -111,7 +114,9 @@ export default function ChatScreen() {
             <Text style={styles.headerTitle}>{t("ai.title")}</Text>
             <View style={styles.onlineRow}>
               <View style={styles.onlineDot} />
-              <Text style={styles.headerSubtitle}>{t("ai.poweredBy")} · {t("ai.updatedNow")}</Text>
+              <Text style={styles.headerSubtitle}>
+                {chatMutation.isPending ? t("ai.typing") : `${t("ai.poweredBy")} · ${t("ai.updatedNow")}`}
+              </Text>
             </View>
           </View>
 
@@ -126,10 +131,12 @@ export default function ChatScreen() {
       </View>
 
       <FlatList
+        ref={listRef}
         style={{ flex: 1 }}
         data={messages}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.messagesWrap}
+        onContentSizeChange={() => listRef.current?.scrollToEnd({ animated: true })}
         renderItem={({ item }) => {
           if (item.role === "user") {
             return (
@@ -147,28 +154,16 @@ export default function ChatScreen() {
                 <Ionicons name="sparkles" size={12} color="#FFFFFF" />
               </View>
               <View style={styles.aiBubble}>
-                <Text style={styles.messageText}>
-                  {parseMessageParts(item.content).map((part, index) => (
-                    <Text
-                      key={`${part.text}-${index}`}
-                      style={
-                        part.style === "moneyPositive"
-                          ? styles.moneyPositive
-                          : part.style === "moneyNegative"
-                            ? styles.moneyNegative
-                            : part.style === "percent"
-                              ? styles.percent
-                              : undefined
-                      }
-                    >
-                      {part.text}
-                    </Text>
-                  ))}
-                </Text>
+                <AiMessageText
+                  content={item.content}
+                  animate={item.id === animatingId}
+                  onDone={() => setAnimatingId((current) => (current === item.id ? null : current))}
+                />
               </View>
             </View>
           );
         }}
+        ListFooterComponent={chatMutation.isPending ? <TypingBubble /> : null}
         ListEmptyComponent={
           <View style={styles.emptyWrap}>
             <Text style={styles.emptyTitle}>{t("ai.emptyTitle")}</Text>
@@ -226,6 +221,102 @@ function TouchableChip({ text, onPress }: { text: string; onPress: () => void })
     <Pressable style={styles.chip} onPress={onPress}>
       <Text style={styles.chipText}>{text}</Text>
     </Pressable>
+  );
+}
+
+// Reveals the assistant's message character-by-character (typewriter effect).
+// Only the newest reply animates; older messages render in full immediately.
+function AiMessageText({ content, animate, onDone }: { content: string; animate: boolean; onDone: () => void }) {
+  const [count, setCount] = useState(animate ? 0 : content.length);
+
+  useEffect(() => {
+    if (!animate) {
+      setCount(content.length);
+      return;
+    }
+    setCount(0);
+    const charsPerTick = Math.max(2, Math.round(content.length / 140));
+    let shown = 0;
+    const timer = setInterval(() => {
+      shown += charsPerTick;
+      if (shown >= content.length) {
+        setCount(content.length);
+        clearInterval(timer);
+        onDone();
+      } else {
+        setCount(shown);
+      }
+    }, 18);
+    return () => clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [animate, content]);
+
+  const visible = content.slice(0, count);
+  const typing = animate && count < content.length;
+
+  return (
+    <Text style={styles.messageText}>
+      {parseMessageParts(visible).map((part, index) => (
+        <Text
+          key={`${index}-${part.text}`}
+          style={
+            part.style === "moneyPositive"
+              ? styles.moneyPositive
+              : part.style === "moneyNegative"
+                ? styles.moneyNegative
+                : part.style === "percent"
+                  ? styles.percent
+                  : undefined
+          }
+        >
+          {part.text}
+        </Text>
+      ))}
+      {typing ? <Text style={styles.caret}>▋</Text> : null}
+    </Text>
+  );
+}
+
+// "AI is typing" bubble with three pulsing dots, shown while awaiting the reply.
+function TypingBubble() {
+  return (
+    <View style={styles.aiRow}>
+      <View style={styles.aiMiniAvatar}>
+        <Ionicons name="sparkles" size={12} color="#FFFFFF" />
+      </View>
+      <View style={[styles.aiBubble, styles.typingBubble]}>
+        <TypingDots />
+      </View>
+    </View>
+  );
+}
+
+function TypingDots() {
+  const d1 = useRef(new Animated.Value(0.3)).current;
+  const d2 = useRef(new Animated.Value(0.3)).current;
+  const d3 = useRef(new Animated.Value(0.3)).current;
+
+  useEffect(() => {
+    const pulse = (value: Animated.Value, startDelay: number) =>
+      Animated.loop(
+        Animated.sequence([
+          Animated.delay(startDelay),
+          Animated.timing(value, { toValue: 1, duration: 300, useNativeDriver: true }),
+          Animated.timing(value, { toValue: 0.3, duration: 300, useNativeDriver: true }),
+          Animated.delay(300 - startDelay),
+        ]),
+      );
+    const anims = [pulse(d1, 0), pulse(d2, 150), pulse(d3, 300)];
+    anims.forEach((a) => a.start());
+    return () => anims.forEach((a) => a.stop());
+  }, [d1, d2, d3]);
+
+  return (
+    <View style={styles.typingDots}>
+      <Animated.View style={[styles.typingDot, { opacity: d1 }]} />
+      <Animated.View style={[styles.typingDot, { opacity: d2 }]} />
+      <Animated.View style={[styles.typingDot, { opacity: d3 }]} />
+    </View>
   );
 }
 
@@ -338,6 +429,24 @@ const styles = makeStyles((colors) => ({
   percent: {
     color: colors.warning,
     fontFamily: typography.fontFamily.monoSemiBold,
+  },
+  caret: {
+    color: colors.accent,
+    fontFamily: typography.fontFamily.body,
+  },
+  typingBubble: {
+    paddingVertical: scale(14),
+  },
+  typingDots: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: scale(5),
+  },
+  typingDot: {
+    width: scale(7),
+    height: scale(7),
+    borderRadius: scale(4),
+    backgroundColor: colors.textSecondary,
   },
   emptyWrap: {
     marginTop: scale(36),

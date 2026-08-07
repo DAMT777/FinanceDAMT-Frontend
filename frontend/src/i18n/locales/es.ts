@@ -313,6 +313,7 @@ export const es = {
       applied: "✓ Aplicado",
       couldNotReach: "No se pudo conectar con IA ahora",
       updatedNow: "Actualizado justo ahora",
+      typing: "escribiendo…",
       clear: "Limpiar",
     },
     profile: {

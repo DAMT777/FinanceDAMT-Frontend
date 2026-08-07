@@ -308,6 +308,7 @@ export const fr = {
       applied: "✓ Appliqué",
       couldNotReach: "Impossible de contacter le service IA pour le moment.",
       updatedNow: "Mis à jour à l'instant",
+      typing: "écrit…",
       clear: "Effacer",
     },
     profile: {

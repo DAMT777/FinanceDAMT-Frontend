@@ -308,6 +308,7 @@ export const en = {
       applied: "✓ Applied",
       couldNotReach: "Could not reach AI service right now.",
       updatedNow: "Updated just now",
+      typing: "typing…",
       clear: "Clear",
     },
     profile: {
