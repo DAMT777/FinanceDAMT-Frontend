@@ -20,6 +20,7 @@ import { savingGoalsApi } from "../../api/savingGoals";
 import { colors } from "../../constants/colors";
 import { typography } from "../../constants/typography";
 import { useDashboard } from "../../hooks/useDashboard";
+import { useNetWorth } from "../../hooks/useAccounts";
 import { useUnreadCount } from "../../hooks/useNotifications";
 import { useTransactions } from "../../hooks/useTransactions";
 import { AppStackParams } from "../../navigation/types";
@@ -103,6 +104,10 @@ export default function DashboardScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<AppStackParams>>();
   const user = useAuthStore((state) => state.user);
   const { data, refetch, isRefetching } = useDashboard();
+  // Net worth is sourced from the same live endpoint the Accounts screen uses,
+  // so the "Patrimonio neto" figure here always matches that screen instead of
+  // drifting from the month-scoped (and cached) dashboard balance.
+  const { data: netWorth, refetch: refetchNetWorth } = useNetWorth();
   const { data: unreadCount = 0 } = useUnreadCount();
   const transactions = useTransactions({ page: 1, pageSize: 5 });
   const { data: budgets = [] } = useQuery({
@@ -170,7 +175,10 @@ export default function DashboardScreen() {
         refreshControl={
           <RefreshControl
             refreshing={isRefetching}
-            onRefresh={() => void refetch()}
+            onRefresh={() => {
+              void refetch();
+              void refetchNetWorth();
+            }}
             tintColor={colors.primary}
             colors={[colors.primary]}
           />
@@ -232,7 +240,7 @@ export default function DashboardScreen() {
         </View>
 
         <AnimatedNumber
-          value={data?.currentBalance ?? 0}
+          value={netWorth?.netWorth ?? data?.currentBalance ?? 0}
           formatter={formatMoney}
           style={styles.balanceValue}
           duration={1000}

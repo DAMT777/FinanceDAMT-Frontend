@@ -17,6 +17,7 @@ import {
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { z } from "zod";
+import ErrorBoundary from "../../components/ErrorBoundary";
 import Input from "../../components/ui/Input";
 import { colors } from "../../constants/colors";
 import { typography } from "../../constants/typography";
@@ -42,7 +43,12 @@ type AddTransactionRoute = RouteProp<AppTabParams, "AddTransaction">;
 
 function formatMoneyInput(value: number): string {
   if (!value) return "$0";
-  return `$${new Intl.NumberFormat("es-CO", { maximumFractionDigits: 0 }).format(value)}`;
+  try {
+    return `$${new Intl.NumberFormat("es-CO", { maximumFractionDigits: 0 }).format(value)}`;
+  } catch {
+    // Fall back to a plain grouped string if Intl is unavailable on the device.
+    return `$${Math.round(value)}`;
+  }
 }
 
 const DEFAULT_CATEGORIES: CategoryDto[] = [
@@ -58,7 +64,7 @@ const DEFAULT_CATEGORIES: CategoryDto[] = [
   { id: "other", name: "Otro", icon: "\u{1F4B3}", color: "#8080AA", type: "Expense", isGlobal: false },
 ];
 
-export default function AddTransactionScreen() {
+function AddTransactionScreenInner() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
@@ -78,9 +84,16 @@ export default function AddTransactionScreen() {
   const showToast = useUIStore((state) => state.showToast);
 
   const toggleSlide = useSharedValue(type === "Income" ? 108 : 0);
+  // Read the raw shared value in the worklet and drive the spring from the JS
+  // handlers below — the same pattern the tab bar uses. Calling withSpring
+  // inside useAnimatedStyle is avoided so the animation stays predictable.
   const slideStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: withSpring(toggleSlide.value, { damping: 18, stiffness: 240 }) }],
+    transform: [{ translateX: toggleSlide.value }],
   }));
+
+  const springTo = (income: boolean) => {
+    toggleSlide.value = withSpring(income ? 108 : 0, { damping: 18, stiffness: 240 });
+  };
 
   const {
     setValue,
@@ -133,7 +146,7 @@ export default function AddTransactionScreen() {
 
   const handleToggle = (nextType: TransactionType) => {
     setType(nextType);
-    toggleSlide.value = nextType === "Income" ? 108 : 0;
+    springTo(nextType === "Income");
   };
 
   const parseAmount = (raw: string) => {
@@ -330,6 +343,24 @@ export default function AddTransactionScreen() {
         </TouchableOpacity>
       </ScrollView>
     </View>
+  );
+}
+
+// Guarded so a render fault in the form degrades to a recoverable fallback
+// (with a way back) instead of force-closing the whole app.
+export default function AddTransactionScreen() {
+  const navigation = useNavigation();
+  return (
+    <ErrorBoundary
+      resetLabel="Volver"
+      onReset={() => {
+        if (navigation.canGoBack()) {
+          navigation.goBack();
+        }
+      }}
+    >
+      <AddTransactionScreenInner />
+    </ErrorBoundary>
   );
 }
 

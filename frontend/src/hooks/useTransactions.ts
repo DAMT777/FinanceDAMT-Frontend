@@ -11,13 +11,22 @@ export function useTransactions(filters: TransactionFilters = {}) {
   });
 }
 
+// Income/expense movements change account balances on the server, so the
+// account and net-worth queries must be refreshed alongside the dashboard to
+// keep every screen showing the same numbers.
+function invalidateFinancialData(queryClient: ReturnType<typeof useQueryClient>) {
+  void queryClient.invalidateQueries({ queryKey: ["transactions"] });
+  void queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+  void queryClient.invalidateQueries({ queryKey: ["accounts"] });
+  void queryClient.invalidateQueries({ queryKey: ["netWorth"] });
+}
+
 export function useCreateTransaction() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (payload: CreateTransactionRequest) => transactionsApi.createTransaction(payload),
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["transactions"] });
-      void queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      invalidateFinancialData(queryClient);
       void queryClient.invalidateQueries({ queryKey: ["notifications"] });
     },
   });
@@ -29,8 +38,7 @@ export function useUpdateTransaction() {
     mutationFn: ({ id, data }: { id: string; data: UpdateTransactionRequest }) =>
       transactionsApi.updateTransaction(id, data),
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["transactions"] });
-      void queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      invalidateFinancialData(queryClient);
     },
   });
 }
@@ -40,8 +48,7 @@ export function useDeleteTransaction() {
   return useMutation({
     mutationFn: (id: string) => transactionsApi.deleteTransaction(id),
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["transactions"] });
-      void queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      invalidateFinancialData(queryClient);
     },
   });
 }
