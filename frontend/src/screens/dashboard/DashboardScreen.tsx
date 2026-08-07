@@ -6,10 +6,13 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { PieChart } from "react-native-gifted-charts";
 import AnimatedNumber from "../../components/AnimatedNumber";
 import BudgetBar from "../../components/BudgetBar";
+import StatCard, { DeltaTone } from "../../components/StatCard";
 import IncomeExpenseChart from "../../components/charts/IncomeExpenseChart";
+import CategoryDonutChart from "../../components/charts/CategoryDonutChart";
+import BalanceTrendChart from "../../components/charts/BalanceTrendChart";
+import DailySpendingChart from "../../components/charts/DailySpendingChart";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import SkeletonCard from "../../components/ui/SkeletonCard";
 import { budgetsApi } from "../../api/budgets";
@@ -19,7 +22,6 @@ import { typography } from "../../constants/typography";
 import { useDashboard } from "../../hooks/useDashboard";
 import { useUnreadCount } from "../../hooks/useNotifications";
 import { useTransactions } from "../../hooks/useTransactions";
-import { useSubscriptions } from "../../hooks/useSubscriptions";
 import { AppStackParams } from "../../navigation/types";
 import { getCategoryDisplay } from "../../utils/categoryIcons";
 import {
@@ -146,6 +148,19 @@ export default function DashboardScreen() {
     .toUpperCase();
 
   const savingsPositive = trend.net >= 0;
+
+  // KPI context values sourced straight from the backend summary (no client
+  // recomputation). Each figure is paired below with a reference frame so it
+  // reads as an insight, not a bare number.
+  const mom = data.monthOverMonthComparison;
+  const expenseChange = mom?.changePercentage ?? 0;
+  // Tone follows meaning, not sign: spending MORE than last month is bad (red),
+  // spending less is good (green).
+  const expenseTone: DeltaTone = expenseChange > 0 ? "bad" : expenseChange < 0 ? "good" : "neutral";
+  const monthIncome = data.totalIncome ?? 0;
+  const monthExpenses = data.totalExpenses ?? 0;
+  const monthNet = monthIncome - monthExpenses;
+  const savingsRate = monthIncome > 0 ? Math.round((monthNet / monthIncome) * 100) : 0;
 
   try {
     return (
@@ -281,6 +296,32 @@ export default function DashboardScreen() {
         ))}
       </View>
 
+      <View style={styles.kpiRow}>
+        <StatCard
+          label={t("dashboard.kpiExpensesTitle")}
+          value={formatShortMoney(monthExpenses)}
+          delta={`${expenseChange > 0 ? "+" : ""}${Math.round(expenseChange)}%`}
+          deltaTone={expenseTone}
+          context={t("dashboard.kpiPrevMonth", {
+            amount: formatShortMoney(mom?.previousMonthExpenses ?? 0),
+          })}
+        />
+        <StatCard
+          label={t("dashboard.kpiSavingsTitle")}
+          value={`${savingsRate}%`}
+          emphasize
+          context={t("dashboard.kpiSavingsCtx", {
+            net: formatShortMoney(Math.max(0, monthNet)),
+            income: formatShortMoney(monthIncome),
+          })}
+        />
+        <StatCard
+          label={t("dashboard.kpiProjectionTitle")}
+          value={formatShortMoney(data.endOfMonthProjection ?? 0)}
+          context={t("dashboard.kpiProjectionCtx")}
+        />
+      </View>
+
       <View style={styles.sectionWrap}>
         <View style={styles.sectionHead}>
           <Text style={styles.sectionTitle}>{t("dashboard.incomeVsExpenses")}</Text>
@@ -355,6 +396,68 @@ export default function DashboardScreen() {
             <View style={styles.chartEmptyBox}>
               <Ionicons name="bar-chart-outline" size={28} color={colors.textMuted} />
               <Text style={styles.chartEmptyText}>{t("dashboard.chartEmpty")}</Text>
+            </View>
+          )}
+        </View>
+      </View>
+
+      <View style={styles.sectionWrap}>
+        <View style={styles.sectionHead}>
+          <Text style={styles.sectionTitle}>{t("dashboard.expensesByCategory")}</Text>
+        </View>
+
+        <View style={styles.chartCard}>
+          {data.expenseBreakdown.length ? (
+            <CategoryDonutChart
+              data={data.expenseBreakdown}
+              centerLabel={t("dashboard.expenses")}
+              othersLabel={t("dashboard.othersCategory")}
+              topLabel={t("dashboard.topExpense")}
+              formatShort={formatShortMoney}
+            />
+          ) : (
+            <View style={styles.chartEmptyBox}>
+              <Ionicons name="pie-chart-outline" size={28} color={colors.textMuted} />
+              <Text style={styles.chartEmptyText}>{t("dashboard.noExpensesMonth")}</Text>
+            </View>
+          )}
+        </View>
+      </View>
+
+      <View style={styles.sectionWrap}>
+        <View style={styles.sectionHead}>
+          <Text style={styles.sectionTitle}>{t("dashboard.balanceEvolutionTitle")}</Text>
+        </View>
+
+        <View style={styles.chartCard}>
+          <BalanceTrendChart
+            data={data.balanceEvolutionLast6Months}
+            locale={locale}
+            currentLabel={t("dashboard.balanceNow")}
+            changeLabel={t("dashboard.inSixMonths")}
+            formatMoney={formatMoney}
+            formatShort={formatShortMoney}
+          />
+        </View>
+      </View>
+
+      <View style={styles.sectionWrap}>
+        <View style={styles.sectionHead}>
+          <Text style={styles.sectionTitle}>{t("dashboard.dailySpendingTitle")}</Text>
+        </View>
+
+        <View style={styles.chartCard}>
+          {data.spendingHeatmap.length ? (
+            <DailySpendingChart
+              data={data.spendingHeatmap}
+              avgLabel={t("dashboard.avgPerDay")}
+              peakLabel={t("dashboard.peakDayLabel")}
+              formatShort={formatShortMoney}
+            />
+          ) : (
+            <View style={styles.chartEmptyBox}>
+              <Ionicons name="bar-chart-outline" size={28} color={colors.textMuted} />
+              <Text style={styles.chartEmptyText}>{t("dashboard.noExpensesMonth")}</Text>
             </View>
           )}
         </View>
@@ -629,6 +732,12 @@ const styles = makeStyles((colors) => ({
     paddingHorizontal: 20,
     flexDirection: "row",
     justifyContent: "space-between",
+  },
+  kpiRow: {
+    marginTop: 24,
+    marginHorizontal: 20,
+    flexDirection: "row",
+    gap: 10,
   },
   quickActionItem: {
     width: "22%",

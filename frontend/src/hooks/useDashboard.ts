@@ -5,15 +5,14 @@ export function useDashboard(month?: number, year?: number) {
   return useQuery({
     queryKey: ["dashboard", month, year],
     queryFn: () => dashboardApi.getSummary(month, year),
+    // Normalize the collection fields so consumers can iterate without null
+    // guards. Names mirror the real API contract (see DashboardSummaryDto).
     select: (data) => ({
       ...data,
-      expenseByCategory: data?.expenseByCategory ?? [],
-      monthlyTrend: data?.monthlyTrend ?? [],
-      balanceEvolution: data?.balanceEvolution ?? [],
+      expenseBreakdown: data?.expenseBreakdown ?? [],
+      incomeVsExpensesLast6Months: data?.incomeVsExpensesLast6Months ?? [],
+      balanceEvolutionLast6Months: data?.balanceEvolutionLast6Months ?? [],
       spendingHeatmap: data?.spendingHeatmap ?? [],
-      recentTransactions: data?.recentTransactions ?? [],
-      savingGoals: data?.savingGoals ?? [],
-      budgets: data?.budgets ?? [],
     }),
     staleTime: 5 * 60 * 1000,
     retry: 1,

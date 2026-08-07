@@ -147,47 +147,49 @@ export interface PaginatedResult<T> {
   totalPages: number;
 }
 
+// Mirrors the API contract returned by GetDashboardSummaryQueryHandler
+// (ASP.NET default camelCase serialization). Field names MUST match the
+// backend record exactly — earlier drift here caused the dashboard to read
+// undefined fields and silently fall back to client-side recomputation.
 export interface DashboardSummaryDto {
   totalIncome: number;
   totalExpenses: number;
   currentBalance: number;
-  monthOverMonthIncomeChange: number;
-  monthOverMonthExpenseChange: number;
-  expenseByCategory?: CategoryBreakdownDto[] | null;
-  monthlyTrend?: MonthlyTrendDto[] | null;
-  balanceEvolution?: BalancePointDto[] | null;
-  spendingHeatmap?: HeatmapDayDto[] | null;
-  recentTransactions?: TransactionDto[] | null;
-  savingGoals?: SavingGoalDto[] | null;
-  budgets?: BudgetDto[] | null;
-  projectedExpenses: number;
+  expenseBreakdown: CategoryExpenseDto[];
+  incomeVsExpensesLast6Months: MonthlyIncomeExpenseDto[];
+  balanceEvolutionLast6Months: MonthlyBalancePointDto[];
+  spendingHeatmap: DailySpendingPointDto[];
+  monthOverMonthComparison: MonthOverMonthComparisonDto;
+  endOfMonthProjection: number;
 }
 
-export interface CategoryBreakdownDto {
-  categoryId: string;
+export interface CategoryExpenseDto {
   categoryName: string;
-  categoryIcon: string;
-  categoryColor: string;
   amount: number;
-  percentage: number;
 }
 
-export interface MonthlyTrendDto {
-  month: string;
+export interface MonthlyIncomeExpenseDto {
   year: number;
+  month: number;
   income: number;
   expenses: number;
 }
 
-export interface BalancePointDto {
-  date: string;
+export interface MonthlyBalancePointDto {
+  year: number;
+  month: number;
   balance: number;
 }
 
-export interface HeatmapDayDto {
+export interface DailySpendingPointDto {
   day: number;
   amount: number;
-  intensity: number;
+}
+
+export interface MonthOverMonthComparisonDto {
+  currentMonthExpenses: number;
+  previousMonthExpenses: number;
+  changePercentage: number;
 }
 
 export interface BudgetDto {

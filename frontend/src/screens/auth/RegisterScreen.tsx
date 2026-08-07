@@ -108,12 +108,17 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
 
   const onSubmit = handleSubmit(async (values) => {
     try {
-      await authApi.register({
+      const result = await authApi.register({
         name: values.name,
         email: values.email,
         password: values.password,
       });
-      navigation.navigate("VerifyEmail", { email: values.email });
+      if (result.requiresEmailVerification) {
+        navigation.navigate("VerifyEmail", { email: values.email });
+      } else {
+        showToast(t("auth.accountCreated"), "success");
+        navigation.navigate("Login");
+      }
     } catch (error) {
       const axiosError = error as AxiosError<{ detail?: string }>;
       const status = axiosError.response?.status;

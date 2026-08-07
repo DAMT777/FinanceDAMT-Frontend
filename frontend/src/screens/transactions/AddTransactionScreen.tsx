@@ -20,6 +20,7 @@ import { z } from "zod";
 import Input from "../../components/ui/Input";
 import { colors } from "../../constants/colors";
 import { typography } from "../../constants/typography";
+import { aiApi } from "../../api/ai";
 import { useAccounts } from "../../hooks/useAccounts";
 import { useCategories } from "../../hooks/useCategories";
 import { useCreateTransaction, useUpdateTransaction } from "../../hooks/useTransactions";
@@ -69,6 +70,7 @@ export default function AddTransactionScreen() {
   );
   const [amountText, setAmountText] = useState("");
   const [description, setDescription] = useState(existingTransaction?.description ?? "");
+  const [isParsing, setIsParsing] = useState(false);
   const { data: categories, isLoading: isLoadingCategories, isError: hasCategoryError } = useCategories();
   const { data: accounts = [] } = useAccounts();
   const createTransaction = useCreateTransaction();
@@ -138,6 +140,41 @@ export default function AddTransactionScreen() {
     const clean = raw.replace(/[^\d]/g, "");
     setAmountText(clean);
     setValue("amount", Number(clean || 0));
+  };
+
+  // Sends the free-text note to the AI parser and pre-fills the amount and, when
+  // it maps to one of the current type's categories, the category too.
+  const handleAIParse = async () => {
+    const note = description.trim();
+    if (!note) {
+      showToast(t("ai.enterNoteFirst"), "warning");
+      return;
+    }
+    setIsParsing(true);
+    try {
+      const parsed = await aiApi.parseExpense(note);
+
+      if (parsed.amount > 0) {
+        const rounded = Math.round(parsed.amount);
+        setAmountText(String(rounded));
+        setValue("amount", rounded);
+      }
+
+      const target = parsed.categoryName?.trim().toLowerCase();
+      if (target) {
+        const sameType = displayCategories.filter((c) => c.type === type);
+        const match =
+          sameType.find((c) => c.name.toLowerCase() === target) ??
+          sameType.find((c) => c.name.toLowerCase().includes(target) || target.includes(c.name.toLowerCase()));
+        if (match) setValue("categoryId", match.id);
+      }
+
+      showToast(t("ai.parseSuccess"), "success");
+    } catch (error) {
+      showToast(getApiErrorMessage(error, t, "ai.parseError"), "error");
+    } finally {
+      setIsParsing(false);
+    }
   };
 
   const onSave = handleSubmit(async (values) => {
@@ -267,9 +304,19 @@ export default function AddTransactionScreen() {
           placeholder=""
         />
 
-        <TouchableOpacity style={styles.aiBtn} onPress={() => showToast(t("ai.unavailable"), "info")}>
-          <Ionicons name="sparkles-outline" size={16} color={colors.accent} />
-          <Text style={styles.aiBtnText}>{t("transactions.parseWithAI")}</Text>
+        <TouchableOpacity
+          style={[styles.aiBtn, isParsing && { opacity: 0.6 }]}
+          onPress={() => void handleAIParse()}
+          disabled={isParsing}
+        >
+          {isParsing ? (
+            <ActivityIndicator size="small" color={colors.accent} />
+          ) : (
+            <>
+              <Ionicons name="sparkles-outline" size={16} color={colors.accent} />
+              <Text style={styles.aiBtnText}>{t("transactions.parseWithAI")}</Text>
+            </>
+          )}
         </TouchableOpacity>
 
         <TouchableOpacity
