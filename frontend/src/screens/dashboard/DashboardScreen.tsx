@@ -15,12 +15,16 @@ import BalanceTrendChart from "../../components/charts/BalanceTrendChart";
 import DailySpendingChart from "../../components/charts/DailySpendingChart";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import SkeletonCard from "../../components/ui/SkeletonCard";
+import SubscriptionsWidget from "../../components/SubscriptionsWidget";
+import FixedVsVariableBar from "../../components/FixedVsVariableBar";
 import { budgetsApi } from "../../api/budgets";
 import { savingGoalsApi } from "../../api/savingGoals";
 import { colors } from "../../constants/colors";
 import { typography } from "../../constants/typography";
 import { useDashboard } from "../../hooks/useDashboard";
 import { useNetWorth } from "../../hooks/useAccounts";
+import { useSubscriptions } from "../../hooks/useSubscriptions";
+import { useVentures } from "../../hooks/useVentures";
 import { useUnreadCount } from "../../hooks/useNotifications";
 import { useTransactions } from "../../hooks/useTransactions";
 import { AppStackParams } from "../../navigation/types";
@@ -108,6 +112,8 @@ export default function DashboardScreen() {
   // so the "Patrimonio neto" figure here always matches that screen instead of
   // drifting from the month-scoped (and cached) dashboard balance.
   const { data: netWorth, refetch: refetchNetWorth } = useNetWorth();
+  const { data: subscriptions = [] } = useSubscriptions();
+  const { data: ventures = [] } = useVentures();
   const { data: unreadCount = 0 } = useUnreadCount();
   const transactions = useTransactions({ page: 1, pageSize: 5 });
   const { data: budgets = [] } = useQuery({
@@ -166,6 +172,11 @@ export default function DashboardScreen() {
   const monthExpenses = data.totalExpenses ?? 0;
   const monthNet = monthIncome - monthExpenses;
   const savingsRate = monthIncome > 0 ? Math.round((monthNet / monthIncome) * 100) : 0;
+  // Fixed monthly commitment from active subscriptions, contrasted against the
+  // month's variable expenses in the split bar below.
+  const subsMonthly = subscriptions
+    .filter((s) => s.isActive)
+    .reduce((acc, s) => acc + s.monthlyCost, 0);
 
   try {
     return (
@@ -331,6 +342,10 @@ export default function DashboardScreen() {
       </View>
 
       <View style={styles.sectionWrap}>
+        <SubscriptionsWidget />
+      </View>
+
+      <View style={styles.sectionWrap}>
         <View style={styles.sectionHead}>
           <Text style={styles.sectionTitle}>{t("dashboard.incomeVsExpenses")}</Text>
         </View>
@@ -415,6 +430,7 @@ export default function DashboardScreen() {
         </View>
 
         <View style={styles.chartCard}>
+          <FixedVsVariableBar fixed={subsMonthly} variable={monthExpenses} formatMoney={formatMoney} />
           {data.expenseBreakdown.length ? (
             <CategoryDonutChart
               data={data.expenseBreakdown}
@@ -521,6 +537,41 @@ export default function DashboardScreen() {
         ) : (
           <TouchableOpacity style={styles.emptyBox} onPress={() => navigation.navigate("AddGoal")}>
             <Text style={styles.emptyTitle}>{t("dashboard.defineFirstGoalCTA")}</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+
+      <View style={styles.sectionWrap}>
+        <View style={styles.sectionHead}>
+          <Text style={styles.sectionTitle}>{t("dashboard.venturesTitle")}</Text>
+          <TouchableOpacity onPress={() => navigation.navigate("Ventures")}>
+            <Text style={styles.viewAllText}>{t("dashboard.venturesSeeAll")}</Text>
+          </TouchableOpacity>
+        </View>
+
+        {ventures.length ? (
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.goalMiniRow}>
+            {ventures.slice(0, 3).map((v) => {
+              const roiCol = v.roiPercentage > 0 ? colors.income : v.roiPercentage < 0 ? colors.expense : colors.textSecondary;
+              return (
+                <TouchableOpacity
+                  key={v.id}
+                  style={styles.goalMiniCard}
+                  onPress={() => navigation.navigate("VentureDetail", { ventureId: v.id })}
+                >
+                  <Text style={styles.goalMiniEmoji}>{v.icon || "🚀"}</Text>
+                  <Text style={styles.goalMiniName} numberOfLines={1}>{v.name}</Text>
+                  <Text style={[styles.ventureMiniRoi, { color: roiCol }]}>
+                    {v.roiPercentage > 0 ? "+" : ""}{Math.round(v.roiPercentage)}% ROI
+                  </Text>
+                  <Text style={styles.goalMiniAmount}>{formatShortMoney(v.netBalance)}</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+        ) : (
+          <TouchableOpacity style={styles.emptyBox} onPress={() => navigation.navigate("Ventures")}>
+            <Text style={styles.emptyTitle}>{t("dashboard.venturesEmpty")}</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -1018,5 +1069,10 @@ const styles = makeStyles((colors) => ({
     color: colors.textSecondary,
     fontSize: 11,
     fontFamily: typography.fontFamily.mono,
+  },
+  ventureMiniRoi: {
+    marginTop: 8,
+    fontSize: 13,
+    fontFamily: typography.fontFamily.monoSemiBold,
   },
 }));

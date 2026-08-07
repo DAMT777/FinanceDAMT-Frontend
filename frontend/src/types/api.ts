@@ -356,3 +356,59 @@ export interface DebtDto {
   dueDate?: string;
   type: "Given" | "Received";
 }
+
+// Entrepreneurship / ROI module. A venture (project) aggregates one or more
+// production batches; metrics (unitCost, netBalance, roiPercentage) are computed
+// by the backend both per-batch and rolled up per-venture.
+export interface VentureBatchDto {
+  id: string;
+  label: string;
+  date: string;
+  investment: number;
+  unitsProduced: number;
+  income: number;
+  unitCost: number;
+  netBalance: number;
+  roiPercentage: number;
+  notes?: string;
+}
+
+export interface VentureDto {
+  id: string;
+  name: string;
+  icon: string;
+  description?: string;
+  isActive: boolean;
+  totalInvestment: number;
+  totalUnitsProduced: number;
+  totalIncome: number;
+  unitCost: number;
+  netBalance: number;
+  roiPercentage: number;
+  batchCount: number;
+  batches: VentureBatchDto[];
+}
+
+export interface CreateVentureRequest {
+  name: string;
+  icon: string;
+  description?: string;
+}
+
+export interface UpdateVentureRequest {
+  name: string;
+  icon: string;
+  description?: string;
+  isActive: boolean;
+}
+
+export interface CreateBatchRequest {
+  label: string;
+  date: string;
+  investment: number;
+  unitsProduced: number;
+  income: number;
+  notes?: string;
+}
+
+export interface UpdateBatchRequest extends CreateBatchRequest {}

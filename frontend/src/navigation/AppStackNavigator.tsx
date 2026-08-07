@@ -13,6 +13,10 @@ import SubscriptionsScreen from "../screens/subscriptions/SubscriptionsScreen";
 import AddSubscriptionScreen from "../screens/subscriptions/AddSubscriptionScreen";
 import ChatScreen from "../screens/ai/ChatScreen";
 import RecommendationsScreen from "../screens/ai/RecommendationsScreen";
+import VenturesScreen from "../screens/ventures/VenturesScreen";
+import AddVentureScreen from "../screens/ventures/AddVentureScreen";
+import VentureDetailScreen from "../screens/ventures/VentureDetailScreen";
+import AddBatchScreen from "../screens/ventures/AddBatchScreen";
 
 const AppStack = createNativeStackNavigator<AppStackParams>();
 
@@ -81,6 +85,26 @@ export default function AppStackNavigator() {
         name="AIRecommendations"
         component={RecommendationsScreen}
         options={{ presentation: "card" }}
+      />
+      <AppStack.Screen
+        name="Ventures"
+        component={VenturesScreen}
+        options={{ presentation: "card" }}
+      />
+      <AppStack.Screen
+        name="AddVenture"
+        component={AddVentureScreen}
+        options={{ presentation: "modal" }}
+      />
+      <AppStack.Screen
+        name="VentureDetail"
+        component={VentureDetailScreen}
+        options={{ presentation: "card" }}
+      />
+      <AppStack.Screen
+        name="AddBatch"
+        component={AddBatchScreen}
+        options={{ presentation: "modal" }}
       />
     </AppStack.Navigator>
   );

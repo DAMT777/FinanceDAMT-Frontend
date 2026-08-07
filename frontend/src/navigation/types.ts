@@ -1,5 +1,5 @@
 import { NavigatorScreenParams } from "@react-navigation/native";
-import { TransactionDto, TransactionType } from "../types/api";
+import { TransactionDto, TransactionType, VentureBatchDto, VentureDto } from "../types/api";
 
 export type AuthStackParams = {
   Splash: undefined;
@@ -33,6 +33,10 @@ export type AppStackParams = {
   AddSubscription: undefined;
   Chat: undefined;
   AIRecommendations: undefined;
+  Ventures: undefined;
+  AddVenture: { venture?: VentureDto } | undefined;
+  VentureDetail: { ventureId: string };
+  AddBatch: { ventureId: string; batch?: VentureBatchDto } | undefined;
 };
 
 export type RootStackParams = {
