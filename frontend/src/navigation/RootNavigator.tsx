@@ -17,6 +17,7 @@ export default function RootNavigator() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const loadStoredAuth = useAuthStore((state) => state.loadStoredAuth);
   const loadSavedLanguage = useUIStore((state) => state.loadSavedLanguage);
+  const loadVenturesEnabled = useUIStore((state) => state.loadVenturesEnabled);
   const theme = useThemeStore((state) => state.theme);
 
   // Persisted across the remount that a theme change triggers, so the user stays
@@ -39,7 +40,8 @@ export default function RootNavigator() {
   useEffect(() => {
     void loadStoredAuth();
     void loadSavedLanguage();
-  }, [loadSavedLanguage, loadStoredAuth]);
+    void loadVenturesEnabled();
+  }, [loadSavedLanguage, loadStoredAuth, loadVenturesEnabled]);
 
   if (isLoading) {
     return <SplashScreen />;

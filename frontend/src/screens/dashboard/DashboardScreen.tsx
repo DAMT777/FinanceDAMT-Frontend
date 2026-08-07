@@ -37,6 +37,7 @@ import {
   rangeStart,
 } from "../../utils/trendBuckets";
 import { useAuthStore } from "../../store/authStore";
+import { useUIStore } from "../../store/uiStore";
 import { makeStyles } from "../../theme/styles";
 
 const QUICK_ACTIONS = [
@@ -114,6 +115,7 @@ export default function DashboardScreen() {
   const { data: netWorth, refetch: refetchNetWorth } = useNetWorth();
   const { data: subscriptions = [] } = useSubscriptions();
   const { data: ventures = [] } = useVentures();
+  const venturesEnabled = useUIStore((state) => state.venturesEnabled);
   const { data: unreadCount = 0 } = useUnreadCount();
   const transactions = useTransactions({ page: 1, pageSize: 5 });
   const { data: budgets = [] } = useQuery({
@@ -258,6 +260,8 @@ export default function DashboardScreen() {
         />
 
         <View style={styles.balanceDivider} />
+
+        <Text style={styles.balanceMonthCaption}>{t("dashboard.thisMonthCaption")}</Text>
 
         <View style={styles.balanceRow}>
           <View style={styles.balanceMetric}>
@@ -541,6 +545,7 @@ export default function DashboardScreen() {
         )}
       </View>
 
+      {venturesEnabled ? (
       <View style={styles.sectionWrap}>
         <View style={styles.sectionHead}>
           <Text style={styles.sectionTitle}>{t("dashboard.venturesTitle")}</Text>
@@ -575,6 +580,7 @@ export default function DashboardScreen() {
           </TouchableOpacity>
         )}
       </View>
+      ) : null}
 
       <View style={styles.sectionWrap}>
         <View style={styles.sectionHead}>
@@ -752,6 +758,14 @@ const styles = makeStyles((colors) => ({
     height: 1,
     backgroundColor: colors.hairline,
     marginVertical: 16,
+  },
+  balanceMonthCaption: {
+    color: "rgba(255,255,255,0.4)",
+    fontSize: 10,
+    letterSpacing: 1.2,
+    textTransform: "uppercase",
+    fontFamily: typography.fontFamily.bodyMedium,
+    marginBottom: 10,
   },
   balanceRow: {
     flexDirection: "row",

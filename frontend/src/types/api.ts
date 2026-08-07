@@ -366,7 +366,10 @@ export interface VentureBatchDto {
   date: string;
   investment: number;
   unitsProduced: number;
-  income: number;
+  unitPrice: number;
+  unitsSold: number;
+  unitsRemaining: number;
+  revenue: number;
   unitCost: number;
   netBalance: number;
   roiPercentage: number;
@@ -381,7 +384,9 @@ export interface VentureDto {
   isActive: boolean;
   totalInvestment: number;
   totalUnitsProduced: number;
-  totalIncome: number;
+  totalUnitsSold: number;
+  totalUnitsRemaining: number;
+  totalRevenue: number;
   unitCost: number;
   netBalance: number;
   roiPercentage: number;
@@ -407,8 +412,12 @@ export interface CreateBatchRequest {
   date: string;
   investment: number;
   unitsProduced: number;
-  income: number;
+  unitPrice: number;
   notes?: string;
 }
 
 export interface UpdateBatchRequest extends CreateBatchRequest {}
+
+export interface RegisterSaleRequest {
+  units: number;
+}

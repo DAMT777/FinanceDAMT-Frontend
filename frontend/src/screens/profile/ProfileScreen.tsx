@@ -19,6 +19,8 @@ export default function ProfileScreen() {
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
   const currentLanguage = useUIStore((state) => state.currentLanguage);
+  const venturesEnabled = useUIStore((state) => state.venturesEnabled);
+  const setVenturesEnabled = useUIStore((state) => state.setVenturesEnabled);
   const theme = useThemeStore((state) => state.theme);
   const toggleTheme = useThemeStore((state) => state.toggleTheme);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
@@ -87,6 +89,21 @@ export default function ProfileScreen() {
               <Switch
                 value={theme === "dark"}
                 onValueChange={toggleTheme}
+                trackColor={{ false: colors.bgCardBorder, true: colors.primary }}
+                thumbColor="#FFFFFF"
+              />
+            </View>
+            <Divider />
+            <View style={styles.row}>
+              <View style={styles.rowLeft}>
+                <View style={[styles.iconCircle, { backgroundColor: "rgba(0,214,143,0.1)" }]}>
+                  <Ionicons name="rocket-outline" size={16} color={colors.primary} />
+                </View>
+                <Text style={styles.rowLabel}>{t("profile.ventures")}</Text>
+              </View>
+              <Switch
+                value={venturesEnabled}
+                onValueChange={(v) => void setVenturesEnabled(v)}
                 trackColor={{ false: colors.bgCardBorder, true: colors.primary }}
                 thumbColor="#FFFFFF"
               />

@@ -34,6 +34,13 @@ function toNumber(text: string): number {
   return Number(text.replace(/[^\d.]/g, "")) || 0;
 }
 
+// The DatePickerField works with "YYYY-MM-DD" keys; produce today's key.
+function todayKey(): string {
+  const d = new Date();
+  const pad = (n: number) => (n < 10 ? `0${n}` : String(n));
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
 type AddBatchRoute = RouteProp<AppStackParams, "AddBatch">;
 
 export default function AddBatchScreen() {
@@ -49,21 +56,23 @@ export default function AddBatchScreen() {
   const showToast = useUIStore((state) => state.showToast);
 
   const [label, setLabel] = useState(existing?.label ?? "");
-  const [date, setDate] = useState(existing?.date ?? new Date().toISOString());
+  // Keep the date as a "YYYY-MM-DD" key so DatePickerField can parse it.
+  const [date, setDate] = useState(existing?.date ? existing.date.slice(0, 10) : todayKey());
   const [investment, setInvestment] = useState(existing ? String(existing.investment) : "");
   const [units, setUnits] = useState(existing ? String(existing.unitsProduced) : "");
-  const [income, setIncome] = useState(existing ? String(existing.income) : "");
+  const [unitPrice, setUnitPrice] = useState(existing ? String(existing.unitPrice) : "");
   const [notes, setNotes] = useState(existing?.notes ?? "");
 
   const investmentNum = toNumber(investment);
   const unitsNum = Math.round(toNumber(units));
-  const incomeNum = toNumber(income);
+  const priceNum = toNumber(unitPrice);
   const unitCost = unitsNum > 0 ? investmentNum / unitsNum : 0;
-  const netBalance = incomeNum - investmentNum;
-  const roi = investmentNum > 0 ? Math.round((netBalance / investmentNum) * 100) : 0;
-  const roiColor = roi > 0 ? colors.income : roi < 0 ? colors.expense : colors.textSecondary;
+  const projectedRevenue = unitsNum * priceNum;
+  const projectedNet = projectedRevenue - investmentNum;
+  const projectedRoi = investmentNum > 0 ? Math.round((projectedNet / investmentNum) * 100) : 0;
+  const roiColor = projectedRoi > 0 ? colors.income : projectedRoi < 0 ? colors.expense : colors.textSecondary;
 
-  const isValid = investmentNum > 0 && unitsNum > 0;
+  const isValid = investmentNum > 0 && unitsNum > 0 && priceNum > 0;
   const isSaving = addBatch.isPending || updateBatch.isPending;
 
   const handleSave = async () => {
@@ -73,10 +82,11 @@ export default function AddBatchScreen() {
     }
     const payload = {
       label: label.trim() || t("ventures.batches"),
-      date: new Date(date).toISOString(),
+      // Anchor to UTC noon so the calendar day is stable across time zones.
+      date: new Date(`${date}T12:00:00.000Z`).toISOString(),
       investment: investmentNum,
       unitsProduced: unitsNum,
-      income: incomeNum,
+      unitPrice: priceNum,
       notes: notes.trim() || undefined,
     };
     try {
@@ -127,8 +137,8 @@ export default function AddBatchScreen() {
         </View>
 
         <View style={styles.fieldGroup}>
-          <Text style={styles.label}>{t("ventures.batchIncome")}</Text>
-          <TextInput value={income} onChangeText={setIncome} keyboardType="numeric" placeholder="0" placeholderTextColor={colors.textMuted} style={[styles.input, styles.mono]} />
+          <Text style={styles.label}>{t("ventures.unitPrice")}</Text>
+          <TextInput value={unitPrice} onChangeText={setUnitPrice} keyboardType="numeric" placeholder="0" placeholderTextColor={colors.textMuted} style={[styles.input, styles.mono]} />
         </View>
 
         <View style={styles.previewCard}>
@@ -138,13 +148,13 @@ export default function AddBatchScreen() {
           </View>
           <View style={styles.previewDivider} />
           <View style={styles.previewItem}>
-            <Text style={styles.previewLabel}>{t("ventures.netBalance")}</Text>
-            <Text style={[styles.previewValue, { color: roiColor }]}>{formatCurrency(netBalance)}</Text>
+            <Text style={styles.previewLabel}>{t("ventures.projectedRevenue")}</Text>
+            <Text style={styles.previewValue}>{formatCurrency(projectedRevenue)}</Text>
           </View>
           <View style={styles.previewDivider} />
           <View style={styles.previewItem}>
-            <Text style={styles.previewLabel}>{t("ventures.roi")}</Text>
-            <Text style={[styles.previewValue, { color: roiColor }]}>{roi > 0 ? "+" : ""}{roi}%</Text>
+            <Text style={styles.previewLabel}>{t("ventures.projectedRoi")}</Text>
+            <Text style={[styles.previewValue, { color: roiColor }]}>{projectedRoi > 0 ? "+" : ""}{projectedRoi}%</Text>
           </View>
         </View>
 
@@ -223,7 +233,7 @@ const styles = makeStyles((colors) => ({
     borderRadius: 14,
     paddingVertical: spacing.md,
   },
-  previewItem: { flex: 1, alignItems: "center", gap: 4 },
+  previewItem: { flex: 1, alignItems: "center", gap: 4, paddingHorizontal: 4 },
   previewDivider: { width: 1, height: 32, backgroundColor: colors.bgCardBorder },
   previewLabel: {
     color: colors.textMuted,

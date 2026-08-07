@@ -2,6 +2,7 @@ import apiClient from "./client";
 import {
   CreateBatchRequest,
   CreateVentureRequest,
+  RegisterSaleRequest,
   UpdateBatchRequest,
   UpdateVentureRequest,
   VentureDto,
@@ -39,6 +40,11 @@ export const venturesApi = {
 
   async updateBatch(ventureId: string, batchId: string, data: UpdateBatchRequest): Promise<VentureDto> {
     const response = await apiClient.put<VentureDto>(`/ventures/${ventureId}/batches/${batchId}`, data);
+    return response.data;
+  },
+
+  async registerSale(ventureId: string, batchId: string, data: RegisterSaleRequest): Promise<VentureDto> {
+    const response = await apiClient.post<VentureDto>(`/ventures/${ventureId}/batches/${batchId}/sales`, data);
     return response.data;
   },
 

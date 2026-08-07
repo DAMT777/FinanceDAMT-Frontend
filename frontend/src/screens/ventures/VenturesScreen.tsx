@@ -40,7 +40,7 @@ export default function VenturesScreen() {
 
   const totals = useMemo(() => {
     const invested = ventures.reduce((a, v) => a + v.totalInvestment, 0);
-    const income = ventures.reduce((a, v) => a + v.totalIncome, 0);
+    const income = ventures.reduce((a, v) => a + v.totalRevenue, 0);
     const net = income - invested;
     const roi = invested > 0 ? Math.round((net / invested) * 100) : 0;
     return { invested, income, net, roi };

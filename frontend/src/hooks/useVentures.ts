@@ -3,6 +3,7 @@ import { venturesApi } from "../api/ventures";
 import {
   CreateBatchRequest,
   CreateVentureRequest,
+  RegisterSaleRequest,
   UpdateBatchRequest,
   UpdateVentureRequest,
 } from "../types/api";
@@ -69,6 +70,15 @@ export function useUpdateBatch() {
   return useMutation({
     mutationFn: ({ ventureId, batchId, data }: { ventureId: string; batchId: string; data: UpdateBatchRequest }) =>
       venturesApi.updateBatch(ventureId, batchId, data),
+    onSuccess: () => invalidate(queryClient),
+  });
+}
+
+export function useRegisterSale() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ ventureId, batchId, data }: { ventureId: string; batchId: string; data: RegisterSaleRequest }) =>
+      venturesApi.registerSale(ventureId, batchId, data),
     onSuccess: () => invalidate(queryClient),
   });
 }
