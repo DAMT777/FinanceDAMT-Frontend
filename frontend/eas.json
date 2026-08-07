@@ -9,7 +9,7 @@
         "buildType": "apk"
       },
       "env": {
-         "EXPO_PUBLIC_API_BASE_URL": "https://shaking-series-swung.ngrok-free.dev/api"
+        "EXPO_PUBLIC_API_BASE_URL": "https://financedamt.duckdns.org/api"
       }
     },
     "production": {}
