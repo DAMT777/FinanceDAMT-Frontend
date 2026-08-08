@@ -503,7 +503,7 @@ export default function DashboardScreen() {
 
         <View style={{ marginTop: 10, gap: 8 }}>
           {budgets.slice(0, 3).map((budget) => (
-            <BudgetBar key={budget.id} budget={budget} />
+            <BudgetBar key={budget.budgetId} budget={budget} />
           ))}
 
           {!budgets.length ? (

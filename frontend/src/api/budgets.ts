@@ -1,5 +1,5 @@
 import apiClient from "./client";
-import { BudgetDto, SetBudgetRequest } from "../types/api";
+import { BudgetDto, BudgetStatusDto, SetBudgetRequest } from "../types/api";
 
 export const budgetsApi = {
   async getBudgets(month?: number, year?: number): Promise<BudgetDto[]> {
@@ -7,8 +7,8 @@ export const budgetsApi = {
     return response.data;
   },
 
-  async getBudgetStatus(month?: number, year?: number): Promise<BudgetDto[]> {
-    const response = await apiClient.get<BudgetDto[]>("/budgets/status", { params: { month, year } });
+  async getBudgetStatus(month?: number, year?: number): Promise<BudgetStatusDto[]> {
+    const response = await apiClient.get<BudgetStatusDto[]>("/budgets/status", { params: { month, year } });
     return response.data;
   },
 

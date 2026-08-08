@@ -1,14 +1,18 @@
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { StyleSheet, Text, View } from "react-native";
-import { BudgetDto } from "../types/api";
+import { BudgetStatusDto } from "../types/api";
 import { colors } from "../constants/colors";
 import { spacing } from "../constants/spacing";
 import { typography } from "../constants/typography";
 import { makeStyles } from "../theme/styles";
 
 interface BudgetBarProps {
-  budget: BudgetDto;
+  budget: BudgetStatusDto;
+}
+
+function money(value: number | undefined | null): string {
+  return (value ?? 0).toLocaleString("es-CO");
 }
 
 function getGradientColors(percentage: number): [string, string] {
@@ -24,7 +28,7 @@ function getPercentageBadgeColor(percentage: number): string {
 }
 
 export default function BudgetBar({ budget }: BudgetBarProps) {
-  const percentage = Math.min(100, Math.max(0, budget.percentage));
+  const percentage = Math.min(100, Math.max(0, budget.percentage ?? 0));
   const gradColors = getGradientColors(percentage);
   const badgeColor = getPercentageBadgeColor(percentage);
 
@@ -37,7 +41,7 @@ export default function BudgetBar({ budget }: BudgetBarProps) {
           </View>
           <View>
             <Text style={styles.title}>{budget.categoryName}</Text>
-            <Text style={styles.limitText}>Limit: {budget.monthlyLimit.toLocaleString("es-CO")}</Text>
+            <Text style={styles.limitText}>Límite: {money(budget.monthlyLimit)}</Text>
           </View>
         </View>
         <View style={[styles.badge, { backgroundColor: `${badgeColor}22`, borderColor: `${badgeColor}55` }]}>
@@ -57,13 +61,13 @@ export default function BudgetBar({ budget }: BudgetBarProps) {
       <View style={styles.bottomRow}>
         <Text style={styles.value}>
           <Text style={{ color: colors.textPrimary, fontFamily: typography.fontFamily.mono }}>
-            {budget.spentAmount.toLocaleString("es-CO")}
+            {money(budget.spent)}
           </Text>
           <Text style={{ color: colors.textMuted }}>
-            {" "}of {budget.monthlyLimit.toLocaleString("es-CO")}
+            {" "}de {money(budget.monthlyLimit)}
           </Text>
         </Text>
-        <Text style={styles.daysLeft}>Budget tracker</Text>
+        <Text style={styles.daysLeft}>Presupuesto</Text>
       </View>
     </View>
   );

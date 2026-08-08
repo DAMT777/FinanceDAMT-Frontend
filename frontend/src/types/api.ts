@@ -214,6 +214,19 @@ export interface SetBudgetRequest {
   year?: number;
 }
 
+// Returned by GET /budgets/status — must match the backend BudgetStatusDto
+// exactly (field names differ from BudgetDto: budgetId/spent, not id/spentAmount).
+export interface BudgetStatusDto {
+  budgetId: string;
+  categoryId: string;
+  categoryName: string;
+  monthlyLimit: number;
+  spent: number;
+  percentage: number;
+  alertSent80: boolean;
+  alertSent100: boolean;
+}
+
 export interface SavingGoalDto {
   id: string;
   name: string;
